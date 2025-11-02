@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Name Explorer — GDPR & UN Compliant</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  body { background-color: #f9fafb; }
+  .chip { display:inline-block; padding:0.25rem 0.75rem; border-radius:9999px; margin:0.25rem; font-size:0.875rem; cursor:pointer; }
+  .seed-chip { background-color:#dbeafe; color:#1e3a8a; }
+  .dynamic-chip { background-color:#d1fae5; color:#065f46; }
+  .privacy-note { font-size:0.875rem; color:#374151; text-align:center; margin-top:2rem; }
+</style>
+</head>
+<body class="font-sans p-4">
+
+<div class="max-w-4xl mx-auto">
+  <h1 class="text-3xl font-bold mb-4 text-center">🌍 Name Explorer — GDPR & UN Compliant</h1>
+  <p class="text-gray-600 mb-6 text-center">
+    Discover nationality probabilities and hear pronunciation — <strong>no personal data is stored or shared.</strong>
+  </p>
+
+  <div class="mb-4 flex items-center">
+    <input type="checkbox" id="consentCheckbox" class="mr-2">
+    <label for="consentCheckbox" class="text-gray-700 text-sm">
+      I understand that this tool only processes first or last names locally in the browser and does not store or transmit data.
+    </label>
+  </div>
+
+  <div class="flex mb-6">
+    <input id="nameInput" type="text" placeholder="Enter first or last name (e.g., Laurent)" class="flex-1 p-4 rounded-l border border-gray-300 focus:outline-none text-lg">
+    <button id="goBtn" class="bg-blue-600 text-white px-6 rounded-r hover:bg-blue-700 text-lg font-semibold">Search</button>
+  </div>
+
+  <div id="results"></div>
+
+  <div class="privacy-note">
+    🔒 Privacy Note: This tool does <strong>not store, log, or transmit</strong> any personal information. All processing happens locally in your browser.
+  </div>
+</div>
+
+<script>
+const countryLanguages={"US":"en","GB":"en","FR":"fr","DE":"de","ES":"es","IT":"it","PT":"pt","RU":"ru","JP":"ja","CN":"zh","KR":"ko","IN":"hi","BR":"pt","CA":"en","AU":"en","MX":"es","NL":"nl","BE":"nl","SE":"sv","CH":"de","AT":"de","NO":"no","DK":"da","FI":"fi","IE":"en","PL":"pl","GR":"el","TR":"tr","IL":"he","SA":"ar","AE":"ar","AR":"es","CL":"es","CO":"es","PE":"es","ZA":"en","NG":"en","PH":"en","TH":"th","VN":"vi","ID":"id","PK":"ur","BD":"bn","LK":"si","EG":"ar","MA":"ar","RO":"ro","HU":"hu"};
+const seedVariants={"Laurent":["Lorenzo","Lawrence","Lavrentiy"],"John":["Juan","Jean","Johann","Giovanni"],"Maria":["Marie","Mary","María","Marya"]};
+
+function soundex(s){const a=s.toUpperCase().split(''),f=a.shift();const codes={B:1,F:1,P:1,V:1,C:2,G:2,J:2,K:2,Q:2,S:2,X:2,Z:2,D:3,T:3,L:4,M:5,N:5,R:6};let r=f,last=codes[f]||0;a.forEach(c=>{const code=codes[c]||0;if(code!==0&&code!==last)r+=code;last=code;});return(r+"000").slice(0,4);}
+function generateVariants(name){let variants=[];if(seedVariants[name])variants=variants.concat(seedVariants[name]);const targetSound=soundex(name);for(const key in seedVariants){if(key!==name&&soundex(key)===targetSound){variants=variants.concat(seedVariants[key]);}}return[...new Set(variants)].filter(v=>v.toLowerCase()!==name.toLowerCase());}
+function playTTS(name,lang){new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(name)}&tl=${lang}&client=tw-ob`).play();}
+function createChip(text,lang,type){return`<span class="chip ${type}" title="Click to hear pronunciation" onclick="playTTS('${text}','${lang}')">🔊 ${text}</span>`;}
+
+const goBtn=document.getElementById('goBtn');
+const input=document.getElementById('nameInput');
+const consentCheckbox=document.getElementById('consentCheckbox');
+const results=document.getElementById('results');
+function clearResults(){results.innerHTML='';}
+
+async function lookupName(name){
+  if(!consentCheckbox.checked){
+    alert("Please confirm that you understand the privacy notice before using this tool.");
+    return;
+  }
+  clearResults();
+  if(!name||name.trim()==='') return;
+  name=name.trim();
+  results.innerHTML=`<div class="p-4 bg-gray-100 rounded text-center font-semibold">Loading… ⏳</div>`;
+  try{
+    const resp=await fetch(`https://api.nationalize.io/?name=${encodeURIComponent(name)}`);
+    const data=await resp.json();
+    let html=`<div class="bg-white p-6 rounded shadow-md mb-4"><h2 class="text-2xl font-semibold mb-2">${name}</h2>`;
+    if(data.country&&data.country.length>0){
+      const topCountry=data.country[0].country_id;
+      const topLang=countryLanguages[topCountry]||'en';
+      playTTS(name,topLang);
+      html+=`<h3 class="text-lg font-medium mb-1">Nationality Probabilities:</h3><canvas id="probChart" class="mb-4"></canvas>`;
+      html+=`<h3 class="text-lg font-medium mb-2">Play TTS in Top Predicted Countries:</h3>`;
+      data.country.slice(0,6).forEach(c=>{
+        const lang=countryLanguages[c.country_id]||'en';
+        html+=createChip(name,lang,'seed-chip');
+      });
+    }
+    const btnBehind=`https://www.behindthename.com/name/${encodeURIComponent(name.toLowerCase())}`;
+    const btnForvo=`https://forvo.com/word/${encodeURIComponent(name.toLowerCase())}/`;
+    const btnNameshouts=`https://www.nameshouts.com/search?q=${encodeURIComponent(name)}`;
+    html+=`<h3 class="text-lg font-medium mb-1">Quick Links:</h3><ul class="list-disc pl-6 mb-3">
+    <li><a href="${btnBehind}" target="_blank" class="text-blue-600 hover:underline">Origin & Meaning — BehindTheName</a></li>
+    <li><a href="${btnForvo}" target="_blank" class="text-blue-600 hover:underline">Pronunciation — Forvo</a></li>
+    <li><a href="${btnNameshouts}" target="_blank" class="text-blue-600 hover:underline">Pronunciation — NameShouts</a></li></ul>`;
+    const variants=generateVariants(name);
+    if(variants.length>0){
+      html+=`<h3 class="text-lg font-medium mb-1">Dynamic Variants:</h3><div>`;
+      const topLang=countryLanguages[data.country[0].country_id]||'en';
+      variants.forEach(v=>{html+=createChip(v,topLang,'dynamic-chip');});
+      html+=`</div>`;
+    }
+    html+=`</div>`;
+    results.innerHTML=html;
+    if(data.country&&data.country.length>0){
+      const ctx=document.getElementById('probChart').getContext('2d');
+      const labels=data.country.slice(0,6).map(c=>c.country_id);
+      const values=data.country.slice(0,6).map(c=>(c.probability*100).toFixed(1));
+      new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Probability (%)',data:values,backgroundColor:'rgba(59,130,246,0.6)'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100}}}});
+    }
+  }catch(err){results.innerHTML=`<div class="p-4 bg-red-100 text-red-700 rounded">Error: ${err.message}</div>`;}
+}
+
+goBtn.addEventListener('click',()=>lookupName(input.value));
+input.addEventListener('keydown',e=>{if(e.key==='Enter')lookupName(input.value);});
+</script>
+</body>
+</html>
