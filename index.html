@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cultural Name Analysis | Discover Your Name's Origins</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
 <style>
 :root {
 --primary: #4a54e1;
@@ -322,6 +321,83 @@ background: rgba(255, 255, 255, 0.3);
 transform: scale(1.1);
 }
 
+/* Custom Modal Styles */
+.custom-modal {
+display: none;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0, 0, 0, 0.7);
+z-index: 1000;
+backdrop-filter: blur(5px);
+align-items: center;
+justify-content: center;
+}
+
+.modal-content {
+background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+border-radius: 20px;
+padding: 40px;
+max-width: 500px;
+width: 90%;
+box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+border: 1px solid rgba(255, 255, 255, 0.1);
+text-align: center;
+position: relative;
+animation: modalAppear 0.3s ease-out;
+}
+
+@keyframes modalAppear {
+from {
+opacity: 0;
+transform: translateY(-30px) scale(0.9);
+}
+to {
+opacity: 1;
+transform: translateY(0) scale(1);
+}
+}
+
+.modal-title {
+font-size: 1.8rem;
+margin-bottom: 15px;
+color: white;
+}
+
+.modal-message {
+font-size: 1.1rem;
+margin-bottom: 30px;
+line-height: 1.6;
+opacity: 0.9;
+}
+
+.modal-ok-btn {
+background: var(--primary);
+color: white;
+border: none;
+border-radius: 50px;
+padding: 12px 30px;
+font-size: 1.1rem;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.3s ease;
+box-shadow: 0 5px 15px rgba(74, 84, 225, 0.4);
+}
+
+.modal-ok-btn:hover {
+background: var(--primary-dark);
+transform: translateY(-2px);
+box-shadow: 0 8px 20px rgba(74, 84, 225, 0.6);
+}
+
+.name-highlight {
+color: #ffd700;
+font-weight: bold;
+font-size: 1.2em;
+}
+
 @media (max-width: 1100px) {
 .main-content {
 flex-direction: column;
@@ -354,6 +430,14 @@ font-size: 2rem;
 .logo {
 font-size: 2.2rem;
 }
+
+.modal-content {
+padding: 30px 20px;
+}
+
+.modal-title {
+font-size: 1.5rem;
+}
 }
 
 @media (max-width: 480px) {
@@ -377,6 +461,17 @@ padding: 25px;
 </style>
 </head>
 <body>
+<!-- Custom Modal -->
+<div class="custom-modal" id="customModal">
+<div class="modal-content">
+<h2 class="modal-title">Cultural Analysis</h2>
+<p class="modal-message" id="modalMessage">
+<!-- Message will be inserted here by JavaScript -->
+</p>
+<button class="modal-ok-btn" id="modalOkBtn">OK</button>
+</div>
+</div>
+
 <div class="container">
 <header>
 <div class="logo">Cultural Name Analysis</div>
@@ -405,8 +500,8 @@ padding: 25px;
 </div>
 
 <div class="search-input-container">
-<input type="text" placeholder="Enter a name to explore its cultural origins...">
-<button class="search-btn">
+<input type="text" id="nameInput" placeholder="Enter a name to explore its cultural origins...">
+<button class="search-btn" id="analyzeBtn">
 <span>Analyze Name</span>
 </button>
 </div>
@@ -446,6 +541,65 @@ let scene, camera, renderer, globe, stars;
 let isMouseDown = false;
 let previousMousePosition = { x: 0, y: 0 };
 const originalCameraZ = 300;
+let animationId = null;
+
+// DOM Elements
+const modal = document.getElementById('customModal');
+const modalMessage = document.getElementById('modalMessage');
+const modalOkBtn = document.getElementById('modalOkBtn');
+const nameInput = document.getElementById('nameInput');
+const analyzeBtn = document.getElementById('analyzeBtn');
+const privacyCheck = document.getElementById('privacyCheck');
+
+// Modal Functions
+function showModal(message) {
+modalMessage.innerHTML = message;
+modal.style.display = 'flex';
+}
+
+function hideModal() {
+modal.style.display = 'none';
+}
+
+// Event Listeners for Modal
+modalOkBtn.addEventListener('click', hideModal);
+modal.addEventListener('click', function(e) {
+if (e.target === modal) {
+hideModal();
+}
+});
+
+// Name Analysis Function
+function analyzeName() {
+if (!privacyCheck.checked) {
+showModal('Please confirm that you understand this tool processes name data for cultural analysis.');
+return;
+}
+
+const name = nameInput.value.trim();
+if (name === '') {
+showModal('Please enter a name to analyze.');
+return;
+}
+
+// Show custom modal with the analysis message
+showModal(`Analyzing the cultural origins of: <span class="name-highlight">${name}</span><br><br>In a full implementation, this would display detailed cultural analysis, distribution maps, and historical context.`);
+
+// Add a visual feedback effect
+const btn = document.querySelector('.search-btn');
+btn.style.background = 'var(--accent)';
+setTimeout(() => {
+btn.style.background = 'var(--primary)';
+}, 1000);
+}
+
+// Event Listeners for Search
+analyzeBtn.addEventListener('click', analyzeName);
+nameInput.addEventListener('keypress', (e) => {
+if (e.key === 'Enter') {
+analyzeName();
+}
+});
 
 function initGlobe() {
 // Scene setup
@@ -467,7 +621,7 @@ renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 // Create the globe with more detail
-const globeGeometry = new THREE.SphereGeometry(100, 128, 128);
+const globeGeometry = new THREE.SphereGeometry(100, 64, 64); // Reduced complexity for better performance
 
 // Create a more detailed texture-like appearance programmatically
 const globeMaterial = new THREE.MeshPhongMaterial({
@@ -483,7 +637,7 @@ globe = new THREE.Mesh(globeGeometry, globeMaterial);
 scene.add(globe);
 
 // Add detailed country outlines
-const outlineGeometry = new THREE.SphereGeometry(101, 128, 128);
+const outlineGeometry = new THREE.SphereGeometry(101, 64, 64);
 const outlineMaterial = new THREE.MeshBasicMaterial({
 color: 0xffffff,
 wireframe: true,
@@ -495,7 +649,7 @@ const outline = new THREE.Mesh(outlineGeometry, outlineMaterial);
 scene.add(outline);
 
 // Add atmospheric glow
-const atmosphereGeometry = new THREE.SphereGeometry(105, 64, 64);
+const atmosphereGeometry = new THREE.SphereGeometry(105, 32, 32); // Reduced complexity
 const atmosphereMaterial = new THREE.MeshBasicMaterial({
 color: 0x4488ff,
 transparent: true,
@@ -514,16 +668,10 @@ const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
 directionalLight.position.set(5, 3, 5);
 scene.add(directionalLight);
 
-const pointLight = new THREE.PointLight(0x4488ff, 0.5, 500);
-pointLight.position.set(10, 10, 10);
-scene.add(pointLight);
-
-// Add stars background
+// Add stars background with fewer stars for performance
 const starGeometry = new THREE.BufferGeometry();
-const starCount = 10000;
+const starCount = 5000; // Reduced from 10000 for better performance
 const positions = new Float32Array(starCount * 3);
-const colors = new Float32Array(starCount * 3);
-const sizes = new Float32Array(starCount);
 
 for (let i = 0; i < starCount * 3; i += 3) {
 // Random position in a sphere
@@ -534,24 +682,13 @@ const phi = Math.acos((Math.random() * 2) - 1);
 positions[i] = radius * Math.sin(phi) * Math.cos(theta);
 positions[i+1] = radius * Math.sin(phi) * Math.sin(theta);
 positions[i+2] = radius * Math.cos(phi);
-
-// Random color (mostly white with some blue/yellow)
-const colorVal = 0.8 + Math.random() * 0.2;
-colors[i] = colorVal;
-colors[i+1] = colorVal;
-colors[i+2] = colorVal + Math.random() * 0.2;
-
-// Random size
-sizes[i/3] = Math.random() * 2;
 }
 
 starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-starGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-starGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
 
 const starMaterial = new THREE.PointsMaterial({
 size: 1.5,
-vertexColors: true,
+color: 0xffffff,
 transparent: true,
 sizeAttenuation: true
 });
@@ -561,7 +698,7 @@ scene.add(stars);
 
 // Animation loop
 function animate() {
-requestAnimationFrame(animate);
+animationId = requestAnimationFrame(animate);
 
 // Slow, natural rotation
 globe.rotation.y += 0.0005;
@@ -650,43 +787,15 @@ camera.position.z = Math.min(600, camera.position.z + 15);
 globeContainer.style.cursor = 'grab';
 }
 
+// Performance optimization: Clean up on page unload
+window.addEventListener('beforeunload', () => {
+if (animationId) {
+cancelAnimationFrame(animationId);
+}
+});
+
 // Initialize the globe when the page loads
 window.addEventListener('load', initGlobe);
-
-// Search button functionality
-document.querySelector('.search-btn').addEventListener('click', () => {
-const nameInput = document.querySelector('input[type="text"]');
-const privacyCheck = document.getElementById('privacyCheck');
-
-if (!privacyCheck.checked) {
-alert('Please confirm that you understand this tool processes name data for cultural analysis.');
-return;
-}
-
-if (nameInput.value.trim() === '') {
-alert('Please enter a name to analyze.');
-return;
-}
-
-// In a real application, this would trigger the name analysis
-// For now, we'll just show a message and add a visual effect
-const name = nameInput.value.trim();
-alert(`Analyzing the cultural origins of: ${name}\n\nIn a full implementation, this would display detailed cultural analysis, distribution maps, and historical context.`);
-
-// Add a visual feedback effect
-const btn = document.querySelector('.search-btn');
-btn.style.background = 'var(--accent)';
-setTimeout(() => {
-btn.style.background = 'var(--primary)';
-}, 1000);
-});
-
-// Allow Enter key to trigger search
-document.querySelector('input[type="text"]').addEventListener('keypress', (e) => {
-if (e.key === 'Enter') {
-document.querySelector('.search-btn').click();
-}
-});
 </script>
 </body>
 </html>
