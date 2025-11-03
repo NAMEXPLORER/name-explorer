@@ -3,110 +3,780 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Name Explorer — GDPR & UN Compliant</title>
+<title>Name Explorer — Privacy-First Name Analysis Tool</title>
+<meta name="description" content="Discover name origins, pronunciations, and nationality probabilities with complete privacy. All processing happens locally in your browser.">
+
+<!-- CSS Resources -->
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Favicon -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
+
 <style>
-  body { background-color: #f9fafb; }
-  .chip { display:inline-block; padding:0.25rem 0.75rem; border-radius:9999px; margin:0.25rem; font-size:0.875rem; cursor:pointer; }
-  .seed-chip { background-color:#dbeafe; color:#1e3a8a; }
-  .dynamic-chip { background-color:#d1fae5; color:#065f46; }
-  .privacy-note { font-size:0.875rem; color:#374151; text-align:center; margin-top:2rem; }
-</style>
-</head>
-<body class="font-sans p-4">
-
-<div class="max-w-4xl mx-auto">
-  <h1 class="text-3xl font-bold mb-4 text-center">🌍 Name Explorer — GDPR & UN Compliant</h1>
-  <p class="text-gray-600 mb-6 text-center">
-    Discover nationality probabilities and hear pronunciation — <strong>no personal data is stored or shared.</strong>
-  </p>
-
-  <div class="mb-4 flex items-center">
-    <input type="checkbox" id="consentCheckbox" class="mr-2">
-    <label for="consentCheckbox" class="text-gray-700 text-sm">
-      I understand that this tool only processes first or last names locally in the browser and does not store or transmit data.
-    </label>
-  </div>
-
-  <div class="flex mb-6">
-    <input id="nameInput" type="text" placeholder="Enter first or last name (e.g., Laurent)" class="flex-1 p-4 rounded-l border border-gray-300 focus:outline-none text-lg">
-    <button id="goBtn" class="bg-blue-600 text-white px-6 rounded-r hover:bg-blue-700 text-lg font-semibold">Search</button>
-  </div>
-
-  <div id="results"></div>
-
-  <div class="privacy-note">
-    🔒 Privacy Note: This tool does <strong>not store, log, or transmit</strong> any personal information. All processing happens locally in your browser.
-  </div>
-</div>
-
-<script>
-const countryLanguages={"US":"en","GB":"en","FR":"fr","DE":"de","ES":"es","IT":"it","PT":"pt","RU":"ru","JP":"ja","CN":"zh","KR":"ko","IN":"hi","BR":"pt","CA":"en","AU":"en","MX":"es","NL":"nl","BE":"nl","SE":"sv","CH":"de","AT":"de","NO":"no","DK":"da","FI":"fi","IE":"en","PL":"pl","GR":"el","TR":"tr","IL":"he","SA":"ar","AE":"ar","AR":"es","CL":"es","CO":"es","PE":"es","ZA":"en","NG":"en","PH":"en","TH":"th","VN":"vi","ID":"id","PK":"ur","BD":"bn","LK":"si","EG":"ar","MA":"ar","RO":"ro","HU":"hu"};
-const seedVariants={"Laurent":["Lorenzo","Lawrence","Lavrentiy"],"John":["Juan","Jean","Johann","Giovanni"],"Maria":["Marie","Mary","María","Marya"]};
-
-function soundex(s){const a=s.toUpperCase().split(''),f=a.shift();const codes={B:1,F:1,P:1,V:1,C:2,G:2,J:2,K:2,Q:2,S:2,X:2,Z:2,D:3,T:3,L:4,M:5,N:5,R:6};let r=f,last=codes[f]||0;a.forEach(c=>{const code=codes[c]||0;if(code!==0&&code!==last)r+=code;last=code;});return(r+"000").slice(0,4);}
-function generateVariants(name){let variants=[];if(seedVariants[name])variants=variants.concat(seedVariants[name]);const targetSound=soundex(name);for(const key in seedVariants){if(key!==name&&soundex(key)===targetSound){variants=variants.concat(seedVariants[key]);}}return[...new Set(variants)].filter(v=>v.toLowerCase()!==name.toLowerCase());}
-function playTTS(name,lang){new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(name)}&tl=${lang}&client=tw-ob`).play();}
-function createChip(text,lang,type){return`<span class="chip ${type}" title="Click to hear pronunciation" onclick="playTTS('${text}','${lang}')">🔊 ${text}</span>`;}
-
-const goBtn=document.getElementById('goBtn');
-const input=document.getElementById('nameInput');
-const consentCheckbox=document.getElementById('consentCheckbox');
-const results=document.getElementById('results');
-function clearResults(){results.innerHTML='';}
-
-async function lookupName(name){
-  if(!consentCheckbox.checked){
-    alert("Please confirm that you understand the privacy notice before using this tool.");
-    return;
-  }
-  clearResults();
-  if(!name||name.trim()==='') return;
-  name=name.trim();
-  results.innerHTML=`<div class="p-4 bg-gray-100 rounded text-center font-semibold">Loading… ⏳</div>`;
-  try{
-    const resp=await fetch(`https://api.nationalize.io/?name=${encodeURIComponent(name)}`);
-    const data=await resp.json();
-    let html=`<div class="bg-white p-6 rounded shadow-md mb-4"><h2 class="text-2xl font-semibold mb-2">${name}</h2>`;
-    if(data.country&&data.country.length>0){
-      const topCountry=data.country[0].country_id;
-      const topLang=countryLanguages[topCountry]||'en';
-      playTTS(name,topLang);
-      html+=`<h3 class="text-lg font-medium mb-1">Nationality Probabilities:</h3><canvas id="probChart" class="mb-4"></canvas>`;
-      html+=`<h3 class="text-lg font-medium mb-2">Play TTS in Top Predicted Countries:</h3>`;
-      data.country.slice(0,6).forEach(c=>{
-        const lang=countryLanguages[c.country_id]||'en';
-        html+=createChip(name,lang,'seed-chip');
-      });
-    }
-    const btnBehind=`https://www.behindthename.com/name/${encodeURIComponent(name.toLowerCase())}`;
-    const btnForvo=`https://forvo.com/word/${encodeURIComponent(name.toLowerCase())}/`;
-    const btnNameshouts=`https://www.nameshouts.com/search?q=${encodeURIComponent(name)}`;
-    html+=`<h3 class="text-lg font-medium mb-1">Quick Links:</h3><ul class="list-disc pl-6 mb-3">
-    <li><a href="${btnBehind}" target="_blank" class="text-blue-600 hover:underline">Origin & Meaning — BehindTheName</a></li>
-    <li><a href="${btnForvo}" target="_blank" class="text-blue-600 hover:underline">Pronunciation — Forvo</a></li>
-    <li><a href="${btnNameshouts}" target="_blank" class="text-blue-600 hover:underline">Pronunciation — NameShouts</a></li></ul>`;
-    const variants=generateVariants(name);
-    if(variants.length>0){
-      html+=`<h3 class="text-lg font-medium mb-1">Dynamic Variants:</h3><div>`;
-      const topLang=countryLanguages[data.country[0].country_id]||'en';
-      variants.forEach(v=>{html+=createChip(v,topLang,'dynamic-chip');});
-      html+=`</div>`;
-    }
-    html+=`</div>`;
-    results.innerHTML=html;
-    if(data.country&&data.country.length>0){
-      const ctx=document.getElementById('probChart').getContext('2d');
-      const labels=data.country.slice(0,6).map(c=>c.country_id);
-      const values=data.country.slice(0,6).map(c=>(c.probability*100).toFixed(1));
-      new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Probability (%)',data:values,backgroundColor:'rgba(59,130,246,0.6)'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100}}}});
-    }
-  }catch(err){results.innerHTML=`<div class="p-4 bg-red-100 text-red-700 rounded">Error: ${err.message}</div>`;}
+:root {
+--primary-color: #3b82f6;
+--success-color: #10b981;
+--warning-color: #f59e0b;
+--error-color: #ef4444;
 }
 
-goBtn.addEventListener('click',()=>lookupName(input.value));
-input.addEventListener('keydown',e=>{if(e.key==='Enter')lookupName(input.value);});
+body {
+background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+min-height: 100vh;
+}
+
+.chip {
+display: inline-block;
+padding: 0.375rem 0.875rem;
+border-radius: 9999px;
+margin: 0.25rem;
+font-size: 0.875rem;
+cursor: pointer;
+transition: all 0.2s ease-in-out;
+border: 2px solid transparent;
+font-weight: 500;
+}
+
+.chip:hover {
+transform: translateY(-2px);
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.seed-chip {
+background-color: #dbeafe;
+color: #1e40af;
+border-color: #93c5fd;
+}
+
+.dynamic-chip {
+background-color: #d1fae5;
+color: #047857;
+border-color: #a7f3d0;
+}
+
+.privacy-note {
+font-size: 0.875rem;
+color: #6b7280;
+text-align: center;
+margin-top: 3rem;
+padding: 1rem;
+background: #f8fafc;
+border-radius: 0.75rem;
+border: 1px solid #e2e8f0;
+}
+
+.loading-spinner {
+display: inline-block;
+width: 24px;
+height: 24px;
+border: 3px solid #f3f4f6;
+border-radius: 50%;
+border-top-color: #3b82f6;
+animation: spin 1s ease-in-out infinite;
+margin-right: 0.5rem;
+}
+
+@keyframes spin {
+to { transform: rotate(360deg); }
+}
+
+.fade-in {
+animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+from {
+opacity: 0;
+transform: translateY(20px);
+}
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
+
+.card {
+background: white;
+border-radius: 1rem;
+box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+border: 1px solid #e5e7eb;
+transition: all 0.3s ease;
+}
+
+.card:hover {
+box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-primary {
+background: linear-gradient(135deg, var(--primary-color) 0%, #1d4ed8 100%);
+transition: all 0.3s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+transform: translateY(-2px);
+box-shadow: 0 8px 15px rgba(59, 130, 246, 0.3);
+}
+
+.btn-primary:disabled {
+background: #9ca3af;
+cursor: not-allowed;
+transform: none;
+}
+
+.input-field {
+transition: all 0.3s ease;
+border: 2px solid #e5e7eb;
+}
+
+.input-field:focus {
+border-color: var(--primary-color);
+box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.feature-badge {
+display: inline-flex;
+align-items: center;
+padding: 0.25rem 0.75rem;
+background: #ecfdf5;
+color: #047857;
+border-radius: 9999px;
+font-size: 0.75rem;
+font-weight: 600;
+margin: 0 0.25rem 0.5rem 0;
+}
+</style>
+</head>
+<body class="font-sans antialiased">
+<!-- Header Section -->
+<header class="text-center py-8 px-4">
+<div class="max-w-4xl mx-auto">
+<h1 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+🌍 Name Explorer
+</h1>
+<p class="text-xl text-gray-600 mb-2">
+Discover name origins, pronunciations, and cultural connections
+</p>
+<div class="flex flex-wrap justify-center mt-4">
+<span class="feature-badge">🔒 100% Private</span>
+<span class="feature-badge">🌐 No Data Stored</span>
+<span class="feature-badge">🎯 Real-time Analysis</span>
+<span class="feature-badge">🔊 Multi-language TTS</span>
+</div>
+</div>
+</header>
+
+<!-- Main Content -->
+<main class="max-w-4xl mx-auto px-4 pb-8">
+<!-- Privacy Consent -->
+<div class="card p-6 mb-6">
+<div class="flex items-start">
+<input
+type="checkbox"
+id="consentCheckbox"
+class="mr-3 mt-1 h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
+>
+<label for="consentCheckbox" class="text-gray-700 text-sm leading-relaxed">
+I understand that this privacy-first tool processes names entirely in my browser.
+No personal data is stored, logged, or transmitted to any servers.
+</label>
+</div>
+</div>
+
+<!-- Search Interface -->
+<div class="card p-2 mb-8">
+<div class="flex flex-col sm:flex-row">
+<input
+id="nameInput"
+type="text"
+placeholder="Enter a first or last name (e.g., Laurent, Sofia, Zhang...)"
+class="input-field flex-1 p-4 rounded-l sm:rounded-r-none text-lg focus:outline-none"
+maxlength="50"
+aria-label="Enter name to analyze"
+>
+<button
+id="analyzeBtn"
+class="btn-primary text-white px-8 py-4 rounded-r sm:rounded-l-none text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-blue-200 mt-2 sm:mt-0"
+disabled
+>
+<span id="btnText">Analyze Name</span>
+<span id="btnLoading" class="hidden">
+<div class="loading-spinner"></div> Analyzing...
+</span>
+</button>
+</div>
+</div>
+
+<!-- Results Section -->
+<div id="results" aria-live="polite"></div>
+
+<!-- Features Grid -->
+<div class="grid md:grid-cols-3 gap-6 mt-12">
+<div class="card p-6 text-center">
+<div class="text-3xl mb-3">🔍</div>
+<h3 class="font-semibold mb-2">Cultural Origins</h3>
+<p class="text-gray-600 text-sm">Discover nationality probabilities and cultural connections</p>
+</div>
+<div class="card p-6 text-center">
+<div class="text-3xl mb-3">🔊</div>
+<h3 class="font-semibold mb-2">Multi-language TTS</h3>
+<p class="text-gray-600 text-sm">Hear pronunciations in different languages and accents</p>
+</div>
+<div class="card p-6 text-center">
+<div class="text-3xl mb-3">🛡️</div>
+<h3 class="font-semibold mb-2">Complete Privacy</h3>
+<p class="text-gray-600 text-sm">All processing happens locally in your browser</p>
+</div>
+</div>
+</main>
+
+<!-- Footer -->
+<footer class="mt-12">
+<div class="privacy-note max-w-4xl mx-auto">
+<strong>🔒 Privacy First:</strong> This tool is designed with privacy by design.
+Names are processed exclusively in your browser using JavaScript.
+No personal data is stored, transmitted, or accessible to any third parties.
+<div class="mt-2 text-xs text-gray-500">
+Uses the <a href="https://nationalize.io" target="_blank" class="underline">Nationalize.io API</a> for nationality probability data
+</div>
+</div>
+</footer>
+
+<script>
+// Configuration Constants
+const CONFIG = {
+API: {
+BASE_URL: 'https://api.nationalize.io',
+TIMEOUT: 10000
+},
+TTS: {
+PROVIDER: 'webSpeech', // 'webSpeech' or 'google'
+RATE: 0.9,
+PITCH: 1.0
+},
+DISPLAY: {
+MAX_COUNTRIES: 8,
+MAX_VARIANTS: 12
+}
+};
+
+// Country code to primary language mapping
+const COUNTRY_LANGUAGES = {
+"US": "en", "GB": "en", "FR": "fr", "DE": "de", "ES": "es", "IT": "it",
+"PT": "pt", "RU": "ru", "JP": "ja", "CN": "zh", "KR": "ko", "IN": "hi",
+"BR": "pt", "CA": "en", "AU": "en", "MX": "es", "NL": "nl", "BE": "nl",
+"SE": "sv", "CH": "de", "AT": "de", "NO": "no", "DK": "da", "FI": "fi",
+"IE": "en", "PL": "pl", "GR": "el", "TR": "tr", "IL": "he", "SA": "ar",
+"AE": "ar", "AR": "es", "CL": "es", "CO": "es", "PE": "es", "ZA": "en",
+"NG": "en", "PH": "en", "TH": "th", "VN": "vi", "ID": "id", "PK": "ur",
+"BD": "bn", "LK": "si", "EG": "ar", "MA": "ar", "RO": "ro", "HU": "hu",
+"CZ": "cs", "SK": "sk", "UA": "uk", "BY": "be", "RS": "sr", "HR": "hr",
+"SI": "sl", "BG": "bg", "EE": "et", "LV": "lv", "LT": "lt", "IS": "is"
+};
+
+// Name variants database
+const NAME_VARIANTS = {
+"Laurent": ["Lorenzo", "Lawrence", "Lavrentiy", "Laurence", "Lorenz"],
+"John": ["Juan", "Jean", "Johann", "Giovanni", "Sean", "Ian", "Ivan"],
+"Maria": ["Marie", "Mary", "María", "Marya", "Mariya", "Mariam"],
+"Michael": ["Miguel", "Michele", "Mikhail", "Mikael", "Micheal"],
+"Anna": ["Anne", "Ana", "Ann", "Hannah", "Annette", "Annie"],
+"David": ["Dávid", "Dawid", "Daid", "Dawood", "Dafydd"],
+"Sarah": ["Sara", "Zara", "Saira", "Saara", "Sarai"],
+"James": ["Jacques", "Jacopo", "Seamus", "Hamish", "Jaime"],
+"Elizabeth": ["Isabel", "Elisabet", "Elżbieta", "Yelizaveta", "Elisheva"],
+"Mohammed": ["Muhammad", "Mehmet", "Mahmoud", "Ahmed", "Hamid"]
+};
+
+// DOM Elements
+const elements = {
+analyzeBtn: document.getElementById('analyzeBtn'),
+nameInput: document.getElementById('nameInput'),
+consentCheckbox: document.getElementById('consentCheckbox'),
+results: document.getElementById('results'),
+btnText: document.getElementById('btnText'),
+btnLoading: document.getElementById('btnLoading')
+};
+
+// Application State
+let state = {
+currentChart: null,
+isAnalyzing: false,
+lastSearchedName: ''
+};
+
+/**
+* Initialize the application
+*/
+function init() {
+setupEventListeners();
+setupAccessibility();
+console.log('🌍 Name Explorer initialized');
+}
+
+/**
+* Set up event listeners
+*/
+function setupEventListeners() {
+elements.analyzeBtn.addEventListener('click', handleAnalysis);
+elements.nameInput.addEventListener('input', handleInputChange);
+elements.nameInput.addEventListener('keydown', (e) => {
+if (e.key === 'Enter' && !state.isAnalyzing) {
+handleAnalysis();
+}
+});
+elements.consentCheckbox.addEventListener('change', handleConsentChange);
+
+// Add some helpful placeholder rotation
+const placeholders = [
+"Enter a first or last name...",
+"Try 'Maria', 'Zhang', or 'Mohammed'...",
+"Discover name origins and pronunciations...",
+"Examples: Laurent, Anna, James..."
+];
+let placeholderIndex = 0;
+setInterval(() => {
+elements.nameInput.placeholder = placeholders[placeholderIndex];
+placeholderIndex = (placeholderIndex + 1) % placeholders.length;
+}, 3000);
+}
+
+/**
+* Set up accessibility features
+*/
+function setupAccessibility() {
+// Add ARIA labels
+elements.nameInput.setAttribute('aria-describedby', 'inputHelp');
+elements.results.setAttribute('aria-live', 'polite');
+elements.results.setAttribute('aria-atomic', 'true');
+}
+
+/**
+* Handle input changes
+*/
+function handleInputChange() {
+const hasText = elements.nameInput.value.trim().length > 0;
+const hasConsent = elements.consentCheckbox.checked;
+elements.analyzeBtn.disabled = !(hasText && hasConsent) || state.isAnalyzing;
+}
+
+/**
+* Handle consent checkbox changes
+*/
+function handleConsentChange() {
+handleInputChange();
+}
+
+/**
+* Handle name analysis
+*/
+function handleAnalysis() {
+const name = elements.nameInput.value.trim();
+if (name && !state.isAnalyzing) {
+analyzeName(name);
+}
+}
+
+/**
+* Soundex algorithm for phonetic matching
+*/
+function soundex(str) {
+if (!str) return '';
+
+const s = str.toUpperCase().split('');
+const f = s.shift();
+const codes = {
+'B': 1, 'F': 1, 'P': 1, 'V': 1,
+'C': 2, 'G': 2, 'J': 2, 'K': 2, 'Q': 2, 'S': 2, 'X': 2, 'Z': 2,
+'D': 3, 'T': 3,
+'L': 4,
+'M': 5, 'N': 5,
+'R': 6
+};
+
+let result = f;
+let lastCode = codes[f] || 0;
+
+s.forEach(char => {
+const code = codes[char] || 0;
+if (code !== 0 && code !== lastCode) {
+result += code;
+}
+lastCode = code;
+});
+
+return (result + "000").slice(0, 4);
+}
+
+/**
+* Generate name variants based on phonetic similarity and known variants
+*/
+function generateVariants(name) {
+const variants = new Set();
+
+// Add known variants
+if (NAME_VARIANTS[name]) {
+NAME_VARIANTS[name].forEach(variant => variants.add(variant));
+}
+
+// Add phonetic variants
+const targetSound = soundex(name);
+for (const [key, variantList] of Object.entries(NAME_VARIANTS)) {
+if (key !== name && soundex(key) === targetSound) {
+variantList.forEach(variant => variants.add(variant));
+}
+}
+
+// Filter out the original name and return as array
+return Array.from(variants).filter(v =>
+v.toLowerCase() !== name.toLowerCase()
+).slice(0, CONFIG.DISPLAY.MAX_VARIANTS);
+}
+
+/**
+* Text-to-speech using Web Speech API with fallback
+*/
+function speakName(name, lang) {
+// Cancel any ongoing speech
+window.speechSynthesis?.cancel();
+
+if ('speechSynthesis' in window) {
+try {
+const utterance = new SpeechSynthesisUtterance(name);
+utterance.lang = lang;
+utterance.rate = CONFIG.TTS.RATE;
+utterance.pitch = CONFIG.TTS.PITCH;
+
+// Try to find a voice that matches the language
+const voices = speechSynthesis.getVoices();
+const voice = voices.find(v => v.lang.startsWith(lang)) || voices[0];
+if (voice) {
+utterance.voice = voice;
+}
+
+speechSynthesis.speak(utterance);
+return true;
+} catch (error) {
+console.warn('Web Speech API failed:', error);
+return false;
+}
+}
+
+return false;
+}
+
+/**
+* Create a pronunciation chip element
+*/
+function createPronunciationChip(text, lang, type = 'seed-chip') {
+const safeText = text.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+return `
+<button class="chip ${type}"
+onclick="speakName('${safeText}', '${lang}')"
+aria-label="Pronounce ${text} in ${lang}"
+title="Click to hear pronunciation in ${lang}">
+🔊 ${text}
+</button>
+`;
+}
+
+/**
+* Show loading state
+*/
+function showLoading() {
+state.isAnalyzing = true;
+elements.btnText.classList.add('hidden');
+elements.btnLoading.classList.remove('hidden');
+elements.analyzeBtn.disabled = true;
+}
+
+/**
+* Hide loading state
+*/
+function hideLoading() {
+state.isAnalyzing = false;
+elements.btnText.classList.remove('hidden');
+elements.btnLoading.classList.add('hidden');
+handleInputChange();
+}
+
+/**
+* Clear previous results
+*/
+function clearResults() {
+elements.results.innerHTML = '';
+if (state.currentChart) {
+state.currentChart.destroy();
+state.currentChart = null;
+}
+}
+
+/**
+* Analyze a name and display results
+*/
+async function analyzeName(name) {
+if (!elements.consentCheckbox.checked) {
+showNotification('Please confirm the privacy notice to continue.', 'warning');
+return;
+}
+
+clearResults();
+showLoading();
+state.lastSearchedName = name;
+
+try {
+// Add timeout to fetch request
+const controller = new AbortController();
+const timeoutId = setTimeout(() => controller.abort(), CONFIG.API.TIMEOUT);
+
+const response = await fetch(
+`${CONFIG.API.BASE_URL}/?name=${encodeURIComponent(name)}`,
+{ signal: controller.signal }
+);
+
+clearTimeout(timeoutId);
+
+if (!response.ok) {
+throw new Error(`API responded with status: ${response.status}`);
+}
+
+const data = await response.json();
+renderResults(name, data);
+
+} catch (error) {
+console.error('Analysis error:', error);
+showError(`Unable to analyze name. Please try again. ${error.message}`);
+} finally {
+hideLoading();
+}
+}
+
+/**
+* Render analysis results
+*/
+function renderResults(name, data) {
+let html = `
+<div class="card p-6 mb-6 fade-in">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-2xl font-bold text-gray-800">${name}</h2>
+<span class="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+Analyzed just now
+</span>
+</div>
+`;
+
+if (data.country && data.country.length > 0) {
+const topCountry = data.country[0];
+const topLang = COUNTRY_LANGUAGES[topCountry.country_id] || 'en';
+
+// Auto-play pronunciation for top country
+setTimeout(() => speakName(name, topLang), 500);
+
+html += `
+<div class="mb-6">
+<h3 class="text-lg font-semibold mb-3 text-gray-700">Nationality Probabilities</h3>
+<div class="bg-gray-50 p-4 rounded-lg">
+<canvas id="probabilityChart" height="200"></canvas>
+</div>
+</div>
+
+<div class="mb-6">
+<h3 class="text-lg font-semibold mb-3 text-gray-700">Hear Pronunciation</h3>
+<p class="text-gray-600 mb-3 text-sm">Click any chip to hear the name pronounced:</p>
+<div class="flex flex-wrap">
+`;
+
+// Add pronunciation chips for top countries
+data.country.slice(0, CONFIG.DISPLAY.MAX_COUNTRIES).forEach(country => {
+const lang = COUNTRY_LANGUAGES[country.country_id] || 'en';
+const probability = (country.probability * 100).toFixed(1);
+html += createPronunciationChip(
+`${name} (${probability}%)`,
+lang,
+'seed-chip'
+);
+});
+
+html += `</div></div>`;
+
+// Create probability chart
+setTimeout(() => renderProbabilityChart(data), 100);
+} else {
+html += `
+<div class="text-center py-8">
+<div class="text-6xl mb-4">🔍</div>
+<h3 class="text-xl font-semibold mb-2 text-gray-700">No Data Found</h3>
+<p class="text-gray-600">
+We couldn't find nationality data for "${name}".
+This might be a very rare or unique name.
+</p>
+</div>
+`;
+}
+
+// Add external resources
+const nameLower = name.toLowerCase();
+html += `
+<div class="mb-6">
+<h3 class="text-lg font-semibold mb-3 text-gray-700">Learn More</h3>
+<div class="grid md:grid-cols-2 gap-4">
+<a href="https://www.behindthename.com/name/${encodeURIComponent(nameLower)}"
+target="_blank"
+class="card p-4 hover:shadow-md transition-shadow block text-center">
+<div class="font-semibold text-blue-600 mb-1">BehindTheName</div>
+<div class="text-sm text-gray-600">Origin & Meaning</div>
+</a>
+<a href="https://forvo.com/word/${encodeURIComponent(nameLower)}/"
+target="_blank"
+class="card p-4 hover:shadow-md transition-shadow block text-center">
+<div class="font-semibold text-green-600 mb-1">Forvo</div>
+<div class="text-sm text-gray-600">Native Pronunciations</div>
+</a>
+</div>
+</div>
+`;
+
+// Add name variants
+const variants = generateVariants(name);
+if (variants.length > 0) {
+html += `
+<div>
+<h3 class="text-lg font-semibold mb-3 text-gray-700">Related Names</h3>
+<p class="text-gray-600 mb-3 text-sm">Discover similar names across cultures:</p>
+<div class="flex flex-wrap">
+`;
+
+const topLang = data.country && data.country.length > 0
+? COUNTRY_LANGUAGES[data.country[0].country_id] || 'en'
+: 'en';
+
+variants.forEach(variant => {
+html += createPronunciationChip(variant, topLang, 'dynamic-chip');
+});
+
+html += `</div></div>`;
+}
+
+html += `</div>`;
+elements.results.innerHTML = html;
+}
+
+/**
+* Render probability chart using Chart.js
+*/
+function renderProbabilityChart(data) {
+const ctx = document.getElementById('probabilityChart');
+if (!ctx) return;
+
+const countries = data.country.slice(0, CONFIG.DISPLAY.MAX_COUNTRIES);
+const labels = countries.map(c => c.country_id);
+const probabilities = countries.map(c => (c.probability * 100).toFixed(1));
+const backgroundColors = [
+'rgba(59, 130, 246, 0.7)', 'rgba(16, 185, 129, 0.7)', 'rgba(245, 158, 11, 0.7)',
+'rgba(139, 92, 246, 0.7)', 'rgba(14, 165, 233, 0.7)', 'rgba(236, 72, 153, 0.7)',
+'rgba(99, 102, 241, 0.7)', 'rgba(20, 184, 166, 0.7)'
+];
+
+state.currentChart = new Chart(ctx, {
+type: 'bar',
+data: {
+labels,
+datasets: [{
+label: 'Probability (%)',
+data: probabilities,
+backgroundColor: backgroundColors,
+borderColor: backgroundColors.map(color => color.replace('0.7', '1')),
+borderWidth: 2,
+borderRadius: 6,
+borderSkipped: false,
+}]
+},
+options: {
+responsive: true,
+maintainAspectRatio: false,
+plugins: {
+legend: {
+display: false
+},
+tooltip: {
+callbacks: {
+label: function(context) {
+return `Probability: ${context.parsed.y}%`;
+}
+}
+}
+},
+scales: {
+y: {
+beginAtZero: true,
+max: 100,
+title: {
+display: true,
+text: 'Probability (%)'
+},
+grid: {
+color: 'rgba(0, 0, 0, 0.1)'
+}
+},
+x: {
+title: {
+display: true,
+text: 'Country Code'
+},
+grid: {
+display: false
+}
+}
+},
+animation: {
+duration: 1000,
+easing: 'easeOutQuart'
+}
+}
+});
+}
+
+/**
+* Show error message
+*/
+function showError(message) {
+elements.results.innerHTML = `
+<div class="card p-6 fade-in">
+<div class="text-center text-red-600">
+<div class="text-4xl mb-3">❌</div>
+<h3 class="text-lg font-semibold mb-2">Analysis Failed</h3>
+<p class="text-gray-700">${message}</p>
+<button onclick="analyzeName('${state.lastSearchedName}')"
+class="btn-primary mt-4 px-6 py-2 rounded">
+Try Again
+</button>
+</div>
+</div>
+`;
+}
+
+/**
+* Show notification
+*/
+function showNotification(message, type = 'info') {
+// Simple notification implementation
+const colors = {
+info: 'blue',
+warning: 'yellow',
+error: 'red',
+success: 'green'
+};
+
+const color = colors[type] || 'blue';
+alert(message); // In a real app, you'd use a proper notification system
+}
+
+// Initialize the application when DOM is loaded
+document.addEventListener('DOMContentLoaded', init);
+
+// Make some functions globally available for onclick handlers
+window.speakName = speakName;
+window.analyzeName = analyzeName;
 </script>
 </body>
 </html>
