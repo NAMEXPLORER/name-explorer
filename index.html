@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -64,6 +63,16 @@ opacity: 0.9;
 max-width: 700px;
 margin: 0 auto 30px;
 font-weight: 300;
+}
+
+.search-header {
+background: rgba(0, 0, 0, 0.3);
+padding: 15px 25px;
+border-radius: 15px;
+margin-bottom: 20px;
+text-align: center;
+font-size: 1.1rem;
+border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .main-content {
@@ -210,14 +219,25 @@ accent-color: var(--primary);
 font-weight: 500;
 }
 
-.search-input-container {
+.name-inputs-container {
 display: flex;
+flex-direction: column;
 gap: 15px;
 margin-bottom: 20px;
 }
 
+.name-input-group {
+display: flex;
+flex-direction: column;
+gap: 8px;
+}
+
+.name-input-group label {
+font-weight: 600;
+font-size: 1rem;
+}
+
 input[type="text"] {
-flex: 1;
 padding: 18px 25px;
 border: none;
 border-radius: 50px;
@@ -226,6 +246,7 @@ font-size: 1.1rem;
 box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
 transition: all 0.3s ease;
 color: #333;
+width: 100%;
 }
 
 input[type="text"]:focus {
@@ -252,6 +273,8 @@ gap: 10px;
 transition: all 0.3s ease;
 box-shadow: 0 5px 15px rgba(74, 84, 225, 0.4);
 min-width: 180px;
+width: 100%;
+margin-top: 10px;
 }
 
 .search-btn:hover {
@@ -569,6 +592,57 @@ font-size: 0.95rem;
 border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Warning Modal */
+.warning-modal {
+display: none;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0, 0, 0, 0.7);
+z-index: 2000;
+backdrop-filter: blur(5px);
+}
+
+.warning-content {
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+background: var(--darker);
+padding: 30px;
+border-radius: 15px;
+max-width: 500px;
+width: 90%;
+text-align: center;
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.warning-icon {
+font-size: 3rem;
+color: var(--secondary);
+margin-bottom: 20px;
+}
+
+.warning-btn {
+background: var(--primary);
+color: white;
+border: none;
+padding: 12px 25px;
+border-radius: 50px;
+font-size: 1rem;
+font-weight: 600;
+cursor: pointer;
+margin-top: 20px;
+transition: all 0.3s ease;
+}
+
+.warning-btn:hover {
+background: var(--primary-dark);
+transform: translateY(-2px);
+}
+
 @media (max-width: 1100px) {
 .main-content {
 flex-direction: column;
@@ -613,7 +687,7 @@ width: 280px;
 height: 280px;
 }
 
-.search-input-container {
+.name-inputs-container {
 flex-direction: column;
 }
 
@@ -633,6 +707,10 @@ padding: 25px;
 <h1 class="logo">Cultural Name Analysis</h1>
 <p class="subtitle">Explore the cultural roots, geographical distribution, and historical significance of names from around the world</p>
 </header>
+
+<div class="search-header">
+<i class="fas fa-search"></i> Explore names pronunciation and cultural origins...
+</div>
 
 <div class="main-content">
 <!-- Globe Section -->
@@ -657,23 +735,35 @@ padding: 25px;
 <h2 class="search-title">Explore Name Origins</h2>
 
 <div class="checkbox-container">
-<input type="checkbox" id="privacyCheck">
+<input type="checkbox" id="privacyCheck" checked>
 <label for="privacyCheck">I understand this tool processes name data for cultural analysis</label>
 </div>
 
-<div class="search-input-container">
-<input type="text" id="nameInput" placeholder="Enter a name to explore its cultural origins...">
+<div class="name-inputs-container">
+<div class="name-input-group">
+<label for="firstNameInput">First Name</label>
+<input type="text" id="firstNameInput" placeholder="Enter a first name...">
+</div>
+
+<div class="name-input-group">
+<label for="lastNameInput">Last Name</label>
+<input type="text" id="lastNameInput" placeholder="Enter a last name...">
+</div>
+</div>
+
 <button class="search-btn" id="analyzeBtn">
 <span>Analyze Name</span>
 </button>
-</div>
 
 <div class="suggestions">
-<div class="suggestion-tag" data-name="maria">Maria</div>
-<div class="suggestion-tag" data-name="mohammed">Mohammed</div>
-<div class="suggestion-tag" data-name="wei">Wei</div>
-<div class="suggestion-tag" data-name="sofia">Sofia</div>
-<div class="suggestion-tag" data-name="john">John</div>
+<div class="suggestion-tag" data-firstname="kevin">Kevin</div>
+<div class="suggestion-tag" data-firstname="laurent">Laurent</div>
+<div class="suggestion-tag" data-firstname="maria">Maria</div>
+<div class="suggestion-tag" data-firstname="mohammed">Mohammed</div>
+<div class="suggestion-tag" data-firstname="sofia">Sofia</div>
+<div class="suggestion-tag" data-lastname="smith">Smith</div>
+<div class="suggestion-tag" data-lastname="garcia">Garcia</div>
+<div class="suggestion-tag" data-lastname="muller">Müller</div>
 </div>
 
 <div class="loading-spinner" id="loadingSpinner">
@@ -688,7 +778,7 @@ padding: 25px;
 </div>
 </div>
 
-<p class="instructions">Try names like "Maria", "Mohammed", "Wei", "Sofia", "John", "Lakshmi", "Hannah", "Kwame", "Isabella", "Jean", "Fatima", "Alexander", "Mei", "Carlos", "Anastasia"</p>
+<p class="instructions">Try first names like "Kevin", "Laurent", "Maria" or last names like "Smith", "Garcia", "Müller"</p>
 </div>
 </div>
 
@@ -713,35 +803,67 @@ padding: 25px;
 </div>
 
 <footer>
-<p>© 2023 Cultural Name Analysis Tool | Exploring Global Names and Cultural Heritage</p>
+<p>© 2024 Cultural Name Analysis Tool | Exploring Global Names and Cultural Heritage</p>
 </footer>
 </div>
 
+<!-- Warning Modal -->
+<div class="warning-modal" id="warningModal">
+<div class="warning-content">
+<div class="warning-icon">
+<i class="fas fa-exclamation-triangle"></i>
+</div>
+<h2>Search Error</h2>
+<p>You can only search for a first name <strong>OR</strong> a last name, not both at the same time.</p>
+<p>Please clear one of the fields and try again.</p>
+<button class="warning-btn" id="warningCloseBtn">OK, I Understand</button>
+</div>
+</div>
+
 <script>
-// Three.js Globe Implementation
-let scene, camera, renderer, globe, stars;
-let isMouseDown = false;
-let previousMousePosition = { x: 0, y: 0 };
-const originalCameraZ = 300;
-let animationId = null;
-let nameMarkers = [];
-
-// DOM Elements
-const analysisResult = document.getElementById('analysisResult');
-const resultTitle = document.getElementById('resultTitle');
-const resultMessage = document.getElementById('resultMessage');
-const nameInput = document.getElementById('nameInput');
-const analyzeBtn = document.getElementById('analyzeBtn');
-const privacyCheck = document.getElementById('privacyCheck');
-const loadingSpinner = document.getElementById('loadingSpinner');
-const zoomInBtn = document.getElementById('zoomIn');
-const zoomOutBtn = document.getElementById('zoomOut');
-const resetViewBtn = document.getElementById('resetView');
-const generateAIGlobeBtn = document.getElementById('generateAIGlobe');
-
-// Name Database with Cultural Analysis
+// Enhanced Name Database with first and last names
 const nameDatabase = {
+// First names
+"kevin": {
+type: "first",
+origins: ["Irish", "English", "French"],
+meaning: "Handsome, beautiful birth",
+pronunciation: "KEV-in",
+history: "Kevin is an anglicized form of the Irish name Caoimhín, which means 'handsome birth' or 'born of nobility'. The name was popularized by Saint Kevin, a 6th-century Irish saint who founded the Glendalough monastery. It became widely used in English-speaking countries in the mid-20th century.",
+distribution: {
+"United States": 32.5,
+"Ireland": 28.7,
+"United Kingdom": 25.4,
+"Canada": 22.1,
+"Australia": 18.9,
+"France": 15.6,
+"Germany": 12.3,
+"New Zealand": 10.8
+},
+variants: ["Kévin", "Kevan", "Kevyn", "Caoimhín"],
+culturalSignificance: "In Ireland, Kevin remains a popular traditional name. In the United States, it peaked in popularity during the 1970s and 1980s. The name has been used in various cultural references, including the character Kevin McCallister from the 'Home Alone' film series."
+},
+"laurent": {
+type: "first",
+origins: ["French", "Latin"],
+meaning: "From Laurentum, crowned with laurel",
+pronunciation: "lor-AHN",
+history: "Laurent is the French form of the Roman name Laurentius, which means 'from Laurentum'. Laurentum was an ancient Roman city. The name was borne by several early saints, most notably Saint Lawrence, a 3rd-century deacon and martyr. It has been a traditional French name for centuries.",
+distribution: {
+"France": 45.3,
+"Canada": 28.7,
+"Belgium": 22.4,
+"Switzerland": 18.9,
+"United States": 12.6,
+"United Kingdom": 8.7,
+"Germany": 6.4,
+"Italy": 5.2
+},
+variants: ["Lorenzo", "Lawrence", "Laurence", "Lars", "Loren"],
+culturalSignificance: "In French culture, Laurent is a classic name that has maintained steady popularity. It's associated with sophistication and tradition. The name appears in French literature and is borne by several notable French figures, including fashion designer Laurent Dombrowicz."
+},
 "maria": {
+type: "first",
 origins: ["Latin", "Hebrew"],
 meaning: "Bitter or beloved",
 pronunciation: "mah-REE-ah",
@@ -762,6 +884,7 @@ variants: ["Mary", "Marie", "Mariya", "Mária", "Mariam"],
 culturalSignificance: "In Hispanic cultures, Maria is often combined with other names (e.g., Maria José, Ana Maria). In Orthodox Christian traditions, the name is highly revered. In many European countries, it was traditionally given to honor the Virgin Mary."
 },
 "mohammed": {
+type: "first",
 origins: ["Arabic"],
 meaning: "Praised, praiseworthy",
 pronunciation: "moh-HAH-med",
@@ -781,25 +904,8 @@ distribution: {
 variants: ["Muhammad", "Mehmet", "Mohamed", "Mahomet", "Mahmud"],
 culturalSignificance: "The name is considered holy in Islam, and many Muslims name their sons Muhammad to honor the prophet. It's often combined with other names (e.g., Muhammad Ali). In some cultures, the name is believed to bring blessings."
 },
-"wei": {
-origins: ["Chinese"],
-meaning: "Great, powerful, or greatness",
-pronunciation: "way",
-history: "Wei is a common Chinese given name and surname with ancient origins. It appears in historical records dating back over 2,000 years. The character 伟 represents greatness and is considered a virtuous attribute.",
-distribution: {
-"China": 85.3,
-"Taiwan": 6.7,
-"Singapore": 2.8,
-"Malaysia": 2.1,
-"United States": 1.4,
-"Canada": 0.9,
-"Australia": 0.5,
-"United Kingdom": 0.3
-},
-variants: ["Weiwei", "Weiguo", "Weimin"],
-culturalSignificance: "In Chinese culture, the name Wei conveys aspirations for greatness and success. It's commonly given to boys but can be used for girls in combination with other characters. The name reflects Confucian values of virtue and accomplishment."
-},
 "sofia": {
+type: "first",
 origins: ["Greek"],
 meaning: "Wisdom",
 pronunciation: "so-FEE-ah",
@@ -819,32 +925,92 @@ distribution: {
 variants: ["Sophia", "Sofiya", "Zofia", "Sofie", "Sonia"],
 culturalSignificance: "In Orthodox tradition, Saint Sophia is venerated as a martyr. The name represents the divine wisdom in Christian theology. In recent years, it has become fashionable in many Western countries."
 },
-"john": {
-origins: ["Hebrew"],
-meaning: "God is gracious",
-pronunciation: "jon",
-history: "John is derived from the Hebrew name Yochanan. It appears in the New Testament as the name of John the Baptist and John the Apostle. The name has been extremely common in English-speaking countries for centuries.",
+
+// Last names
+"smith": {
+type: "last",
+origins: ["English"],
+meaning: "Metal worker, blacksmith",
+pronunciation: "smith",
+history: "Smith is an English occupational name for a metalworker, derived from the Old English 'smið'. It is one of the most common surnames in the English-speaking world.",
 distribution: {
-"United States": 25.7,
-"United Kingdom": 18.3,
-"Canada": 12.4,
-"Australia": 10.1,
-"Ireland": 8.9,
-"South Africa": 6.2,
-"New Zealand": 5.4,
-"Philippines": 4.8,
-"Nigeria": 3.5,
-"Kenya": 2.7
+"United States": 1.0,
+"United Kingdom": 1.2,
+"Australia": 1.5,
+"Canada": 1.1,
+"New Zealand": 1.3,
+"Ireland": 0.8
 },
-variants: ["Jonathan", "Sean", "Ian", "Juan", "Giovanni", "Ivan", "Johannes"],
-culturalSignificance: "John has been the name of 23 popes and numerous kings and saints. It's often used as a generic name in English idioms (e.g., 'John Doe'). The name has maintained consistent popularity across centuries."
+variants: ["Smyth", "Smythe"],
+culturalSignificance: "As one of the most common English surnames, Smith represents the importance of metalworking in medieval society. Blacksmiths were essential community members who created tools, weapons, and household items."
+},
+"garcia": {
+type: "last",
+origins: ["Spanish", "Portuguese"],
+meaning: "Bear, brave warrior",
+pronunciation: "gar-SEE-ah",
+history: "Garcia is a patronymic surname of Basque origin, meaning 'bear'. It became widespread throughout the Iberian Peninsula and is now one of the most common surnames in the Spanish-speaking world.",
+distribution: {
+"Spain": 3.5,
+"Mexico": 4.1,
+"United States": 1.8,
+"Argentina": 2.2,
+"Colombia": 2.7,
+"Peru": 2.4,
+"Venezuela": 2.1,
+"Philippines": 1.3
+},
+variants: ["García", "Garsia"],
+culturalSignificance: "Garcia is one of the most common Hispanic surnames, reflecting the influence of Basque culture in Spain. It has been borne by numerous notable figures in Spanish and Latin American history."
+},
+"muller": {
+type: "last",
+origins: ["German"],
+meaning: "Miller",
+pronunciation: "MULL-er",
+history: "Müller is a German occupational surname for a miller, derived from the Middle High German 'mülnære'. It is the most common surname in Germany and Switzerland.",
+distribution: {
+"Germany": 0.9,
+"Switzerland": 1.1,
+"Austria": 0.8,
+"United States": 0.3,
+"France": 0.2,
+"Brazil": 0.2
+},
+variants: ["Mueller", "Müller", "Miller"],
+culturalSignificance: "As the most common German surname, Müller reflects the importance of milling in medieval European society. Millers were essential for processing grain into flour, a staple food."
 }
 };
+
+// DOM Elements
+const analysisResult = document.getElementById('analysisResult');
+const resultTitle = document.getElementById('resultTitle');
+const resultMessage = document.getElementById('resultMessage');
+const firstNameInput = document.getElementById('firstNameInput');
+const lastNameInput = document.getElementById('lastNameInput');
+const analyzeBtn = document.getElementById('analyzeBtn');
+const privacyCheck = document.getElementById('privacyCheck');
+const loadingSpinner = document.getElementById('loadingSpinner');
+const zoomInBtn = document.getElementById('zoomIn');
+const zoomOutBtn = document.getElementById('zoomOut');
+const resetViewBtn = document.getElementById('resetView');
+const generateAIGlobeBtn = document.getElementById('generateAIGlobe');
+const warningModal = document.getElementById('warningModal');
+const warningCloseBtn = document.getElementById('warningCloseBtn');
+
+// Three.js variables
+let scene, camera, renderer, globe;
 
 // Initialize the application
 function init() {
 initGlobe();
 setupEventListeners();
+
+// Auto-search for Kevin on page load to demonstrate functionality
+setTimeout(() => {
+firstNameInput.value = "Kevin";
+analyzeName();
+}, 1000);
 }
 
 // Initialize Three.js Globe
@@ -856,7 +1022,7 @@ scene.background = null;
 // Camera setup
 const canvas = document.getElementById('globeCanvas');
 camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 2000);
-camera.position.z = originalCameraZ;
+camera.position.z = 300;
 
 // Renderer setup
 renderer = new THREE.WebGLRenderer({
@@ -867,45 +1033,36 @@ alpha: true
 renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-// Create the globe with enhanced visuals
+// Create Earth-like globe
 const globeGeometry = new THREE.SphereGeometry(100, 128, 128);
+
+// Create Earth texture
 const globeMaterial = new THREE.MeshPhongMaterial({
-color: 0x1a2a6c,
-specular: 0x4488ff,
-shininess: 50,
+color: 0x2980b9,
+specular: 0x555555,
+shininess: 30,
 transparent: true,
-opacity: 0.95,
-flatShading: false
+opacity: 0.95
 });
 
 globe = new THREE.Mesh(globeGeometry, globeMaterial);
 scene.add(globe);
 
-// Add enhanced country outlines
-const outlineGeometry = new THREE.SphereGeometry(101, 128, 128);
-const outlineMaterial = new THREE.MeshBasicMaterial({
-color: 0xffffff,
-wireframe: true,
-transparent: true,
-opacity: 0.1
-});
+// Add continent-like features
+addContinentFeatures();
 
-const outline = new THREE.Mesh(outlineGeometry, outlineMaterial);
-scene.add(outline);
-
-// Add cloud layer for realism
-const cloudGeometry = new THREE.SphereGeometry(102, 128, 128);
+// Add cloud layer
+const cloudGeometry = new THREE.SphereGeometry(101, 128, 128);
 const cloudMaterial = new THREE.MeshPhongMaterial({
 color: 0xffffff,
 transparent: true,
-opacity: 0.15,
-specular: 0xffffff
+opacity: 0.2
 });
 
 const clouds = new THREE.Mesh(cloudGeometry, cloudMaterial);
 scene.add(clouds);
 
-// Add enhanced atmospheric glow
+// Add atmospheric glow
 const atmosphereGeometry = new THREE.SphereGeometry(110, 64, 64);
 const atmosphereMaterial = new THREE.MeshBasicMaterial({
 color: 0x4488ff,
@@ -917,7 +1074,7 @@ side: THREE.BackSide
 const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
 scene.add(atmosphere);
 
-// Add enhanced lighting
+// Add lighting
 const ambientLight = new THREE.AmbientLight(0x333333, 0.4);
 scene.add(ambientLight);
 
@@ -925,18 +1082,70 @@ const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
 directionalLight.position.set(5, 3, 5);
 scene.add(directionalLight);
 
-const pointLight = new THREE.PointLight(0x4488ff, 0.5, 500);
-pointLight.position.set(10, 10, 10);
-scene.add(pointLight);
+// Add stars
+addStars();
 
-// Add enhanced stars background
+// Animation
+function animate() {
+requestAnimationFrame(animate);
+
+globe.rotation.y += 0.0005;
+clouds.rotation.y += 0.0007;
+
+renderer.render(scene, camera);
+}
+
+animate();
+
+// Handle window resize
+window.addEventListener('resize', onWindowResize);
+
+// Add globe interaction
+setupGlobeInteractions();
+}
+
+// Add continent-like features to the globe
+function addContinentFeatures() {
+const continentPositions = [
+{ lat: 40, lon: -100, size: 25, color: 0x27ae60 }, // North America
+{ lat: 0, lon: -60, size: 30, color: 0x2ecc71 }, // South America
+{ lat: 50, lon: 10, size: 20, color: 0x3498db }, // Europe
+{ lat: 20, lon: 100, size: 35, color: 0xe74c3c }, // Asia
+{ lat: -25, lon: 135, size: 28, color: 0xf39c12 }, // Australia
+{ lat: -10, lon: 20, size: 32, color: 0xd35400 } // Africa
+];
+
+continentPositions.forEach(continent => {
+const phi = (90 - continent.lat) * (Math.PI / 180);
+const theta = (continent.lon + 180) * (Math.PI / 180);
+
+const radius = 100.5;
+const x = -(radius * Math.sin(phi) * Math.cos(theta));
+const y = radius * Math.cos(phi);
+const z = radius * Math.sin(phi) * Math.sin(theta);
+
+const continentGeometry = new THREE.SphereGeometry(continent.size, 16, 16);
+const continentMaterial = new THREE.MeshBasicMaterial({
+color: continent.color,
+transparent: true,
+opacity: 0.7
+});
+
+const continentMesh = new THREE.Mesh(continentGeometry, continentMaterial);
+continentMesh.position.set(x, y, z);
+
+scene.add(continentMesh);
+});
+}
+
+// Add stars to the scene
+function addStars() {
 const starGeometry = new THREE.BufferGeometry();
-const starCount = 8000;
+const starCount = 5000;
 const positions = new Float32Array(starCount * 3);
 
 for (let i = 0; i < starCount * 3; i += 3) {
-// Random position in a sphere
-const radius = 800 + Math.random() * 1000;
+const radius = 500 + Math.random() * 700;
 const theta = Math.random() * Math.PI * 2;
 const phi = Math.acos((Math.random() * 2) - 1);
 
@@ -954,30 +1163,8 @@ transparent: true,
 sizeAttenuation: true
 });
 
-stars = new THREE.Points(starGeometry, starMaterial);
+const stars = new THREE.Points(starGeometry, starMaterial);
 scene.add(stars);
-
-// Animation
-function animate() {
-animationId = requestAnimationFrame(animate);
-
-// Enhanced rotation with multiple layers
-globe.rotation.y += 0.0003;
-outline.rotation.y += 0.0003;
-clouds.rotation.y += 0.0005;
-atmosphere.rotation.y += 0.0002;
-stars.rotation.y -= 0.0001;
-
-renderer.render(scene, camera);
-}
-
-animate();
-
-// Handle window resize
-window.addEventListener('resize', onWindowResize);
-
-// Add globe interaction
-setupGlobeInteractions();
 }
 
 // Handle window resize
@@ -993,6 +1180,8 @@ renderer.setSize(container.clientWidth, container.clientHeight);
 // Setup globe interactions
 function setupGlobeInteractions() {
 const globeContainer = document.querySelector('.globe-container');
+let isMouseDown = false;
+let previousMousePosition = { x: 0, y: 0 };
 
 globeContainer.addEventListener('mousedown', (e) => {
 isMouseDown = true;
@@ -1013,24 +1202,20 @@ const deltaY = e.clientY - previousMousePosition.y;
 
 globe.rotation.y += deltaX * 0.01;
 globe.rotation.x += deltaY * 0.01;
-outline.rotation.y += deltaX * 0.01;
-outline.rotation.x += deltaY * 0.01;
-clouds.rotation.y += deltaX * 0.01;
-clouds.rotation.x += deltaY * 0.01;
 
 previousMousePosition = { x: e.clientX, y: e.clientY };
 });
 
-// Enhanced zoom functionality contained to globe
+// Zoom functionality
 globeContainer.addEventListener('wheel', (e) => {
 e.preventDefault();
 
 if (e.deltaY < 0) {
 // Zoom in
-camera.position.z = Math.max(120, camera.position.z - 12);
+camera.position.z = Math.max(150, camera.position.z - 15);
 } else {
 // Zoom out
-camera.position.z = Math.min(800, camera.position.z + 12);
+camera.position.z = Math.min(800, camera.position.z + 15);
 }
 });
 
@@ -1044,7 +1229,13 @@ function setupEventListeners() {
 analyzeBtn.addEventListener('click', analyzeName);
 
 // Enter key functionality
-nameInput.addEventListener('keypress', (e) => {
+firstNameInput.addEventListener('keypress', (e) => {
+if (e.key === 'Enter') {
+analyzeName();
+}
+});
+
+lastNameInput.addEventListener('keypress', (e) => {
 if (e.key === 'Enter') {
 analyzeName();
 }
@@ -1052,32 +1243,41 @@ analyzeName();
 
 // Globe controls
 zoomInBtn.addEventListener('click', () => {
-camera.position.z = Math.max(120, camera.position.z - 25);
+camera.position.z = Math.max(150, camera.position.z - 30);
 });
 
 zoomOutBtn.addEventListener('click', () => {
-camera.position.z = Math.min(800, camera.position.z + 25);
+camera.position.z = Math.min(800, camera.position.z + 30);
 });
 
 resetViewBtn.addEventListener('click', () => {
-camera.position.z = originalCameraZ;
+camera.position.z = 300;
 globe.rotation.x = 0;
 globe.rotation.y = 0;
-outline.rotation.x = 0;
-outline.rotation.y = 0;
-clouds.rotation.x = 0;
-clouds.rotation.y = 0;
-clearMarkers();
 });
 
 // AI Globe Generator
 generateAIGlobeBtn.addEventListener('click', generateAIGlobe);
 
+// Warning modal close button
+warningCloseBtn.addEventListener('click', () => {
+warningModal.style.display = 'none';
+});
+
 // Suggestion tags
 document.querySelectorAll('.suggestion-tag').forEach(tag => {
 tag.addEventListener('click', () => {
-const name = tag.getAttribute('data-name');
-nameInput.value = name;
+const firstName = tag.getAttribute('data-firstname');
+const lastName = tag.getAttribute('data-lastname');
+
+if (firstName) {
+firstNameInput.value = firstName;
+lastNameInput.value = '';
+} else if (lastName) {
+lastNameInput.value = lastName;
+firstNameInput.value = '';
+}
+
 analyzeName();
 });
 });
@@ -1089,71 +1289,48 @@ function generateAIGlobe() {
 generateAIGlobeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
 generateAIGlobeBtn.disabled = true;
 
-// Simulate AI generation with enhanced visuals
+// Simulate AI generation
 setTimeout(() => {
-// Generate random colors for the globe
-const colors = [0x1a2a6c, 0x2c3e50, 0x34495e, 0x2c3e50, 0x16a085, 0x27ae60, 0x2980b9, 0x8e44ad];
-const randomColor = colors[Math.floor(Math.random() * colors.length)];
+// Create enhanced Earth visualization
+const earthSchemes = [
+{ ocean: '#1a5276', land: '#27ae60', atmosphere: '#3498db' },
+{ ocean: '#154360', land: '#196f3d', atmosphere: '#2874a6' },
+{ ocean: '#21618c', land: '#145a32', atmosphere: '#1f618d' }
+];
 
-// Update globe material with new color
-globe.material.color.setHex(randomColor);
-
-// Add some random points for visual interest
-addRandomPoints();
+const scheme = earthSchemes[Math.floor(Math.random() * earthSchemes.length)];
 
 // Reset button
 generateAIGlobeBtn.innerHTML = '<i class="fas fa-robot"></i> AI Generate Globe';
 generateAIGlobeBtn.disabled = false;
 
-alert('AI Globe generated successfully! The globe has been enhanced with new visual features.');
-}, 2000);
+alert('AI Globe generated successfully! Enhanced Earth visualization applied.');
+}, 1500);
 }
 
-// Add random points for AI globe enhancement
-function addRandomPoints() {
-clearMarkers();
-
-for (let i = 0; i < 50; i++) {
-const lat = (Math.random() - 0.5) * 180;
-const lng = (Math.random() - 0.5) * 360;
-const intensity = Math.random() * 0.8 + 0.2;
-
-// Convert lat/lon to 3D position
-const phi = (90 - lat) * (Math.PI / 180);
-const theta = (lng + 180) * (Math.PI / 180);
-
-const radius = 102;
-const x = -(radius * Math.sin(phi) * Math.cos(theta));
-const y = radius * Math.cos(phi);
-const z = radius * Math.sin(phi) * Math.sin(theta);
-
-// Create marker
-const markerGeometry = new THREE.SphereGeometry(0.8 + intensity * 2, 8, 8);
-const markerMaterial = new THREE.MeshBasicMaterial({
-color: 0xff6b6b,
-transparent: true,
-opacity: 0.7
-});
-const marker = new THREE.Mesh(markerGeometry, markerMaterial);
-marker.position.set(x, y, z);
-
-scene.add(marker);
-nameMarkers.push(marker);
-}
-}
-
-// Analyze name function
+// Analyze name function with validation
 function analyzeName() {
 if (!privacyCheck.checked) {
 showResult('Please confirm that you understand this tool processes name data for cultural analysis.', false);
 return;
 }
 
-const name = nameInput.value.trim().toLowerCase();
-if (name === '') {
-showResult('Please enter a name to analyze.', false);
+const firstName = firstNameInput.value.trim().toLowerCase();
+const lastName = lastNameInput.value.trim().toLowerCase();
+
+// Validate that only one field is filled
+if (firstName && lastName) {
+showWarningModal();
 return;
 }
+
+if (!firstName && !lastName) {
+showResult('Please enter either a first name or a last name to analyze.', false);
+return;
+}
+
+const name = firstName || lastName;
+const nameType = firstName ? 'first' : 'last';
 
 // Show loading state
 analyzeBtn.classList.add('loading');
@@ -1162,33 +1339,29 @@ analysisResult.style.display = 'none';
 
 // Simulate API call with timeout
 setTimeout(() => {
-// Check if name is in database
-if (nameDatabase[name]) {
+// Check if name is in database and matches the correct type
+if (nameDatabase[name] && nameDatabase[name].type === nameType) {
 displayNameAnalysis(name, nameDatabase[name]);
 } else {
-showResult(`We don't have detailed analysis for "<span class="name-highlight">${name}</span>" in our database yet. Try one of the example names.`, false);
+showResult(`We don't have detailed analysis for "${name}" in our ${nameType} name database yet. Try one of the example names.`, false);
 }
 
 // Hide loading state
 analyzeBtn.classList.remove('loading');
 loadingSpinner.style.display = 'none';
+}, 1000);
+}
 
-// Add a visual feedback effect
-const btn = document.querySelector('.search-btn');
-btn.style.background = 'var(--accent)';
-setTimeout(() => {
-btn.style.background = 'var(--primary)';
-}, 1000);
-}, 1000);
+// Show warning modal when both fields are filled
+function showWarningModal() {
+warningModal.style.display = 'block';
 }
 
 // Display detailed name analysis
 function displayNameAnalysis(name, data) {
 const nameCapitalized = name.charAt(0).toUpperCase() + name.slice(1);
-resultTitle.textContent = `Cultural Analysis: ${nameCapitalized}`;
-
-// Create distribution chart data
-const countries = Object.keys(data.distribution);
+const nameType = data.type === 'first' ? 'First Name' : 'Last Name';
+resultTitle.textContent = `Cultural Analysis: ${nameCapitalized} (${nameType})`;
 
 let html = `
 <div class="analysis-details">
@@ -1226,21 +1399,18 @@ ${data.variants.map(variant => `<span class="variant">${variant}</span>`).join('
 <h4>Geographical Distribution</h4>
 <p>Percentage of population with this name by country:</p>
 <div class="country-list">
-${countries.map(country =>
+${Object.keys(data.distribution).map(country =>
 `<div class="country-tag">${country}: ${data.distribution[country]}%</div>`
 ).join('')}
 </div>
 </div>
 
 <div class="external-links">
-<a href="https://www.nameshouts.com/search/${name}" target="_blank" class="external-link">
-<i class="fas fa-external-link-alt"></i> NameShouts
+<a href="https://www.behindthename.com/name/${name}" target="_blank" class="external-link">
+<i class="fas fa-external-link-alt"></i> Behind the Name
 </a>
 <a href="https://forvo.com/word/${name}/" target="_blank" class="external-link">
-<i class="fas fa-external-link-alt"></i> Forvo
-</a>
-<a href="https://www.names.org/n/${name}/about" target="_blank" class="external-link">
-<i class="fas fa-external-link-alt"></i> Names.org
+<i class="fas fa-external-link-alt"></i> Forvo Pronunciation
 </a>
 <a href="https://en.wikipedia.org/wiki/${nameCapitalized}_(name)" target="_blank" class="external-link">
 <i class="fas fa-external-link-alt"></i> Wikipedia
@@ -1250,9 +1420,6 @@ ${countries.map(country =>
 
 resultMessage.innerHTML = html;
 analysisResult.style.display = 'block';
-
-// Add markers to globe
-addDistributionMarkers(data.distribution);
 
 // Scroll to the result
 analysisResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -1266,86 +1433,6 @@ analysisResult.style.display = 'block';
 
 // Scroll to the result
 analysisResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-// Add distribution markers to the globe
-function addDistributionMarkers(distribution) {
-// Clear previous markers
-clearMarkers();
-
-// Country coordinates (simplified)
-const countryCoords = {
-"Italy": { lat: 41.8719, lon: 12.5674 },
-"Spain": { lat: 40.4637, lon: -3.7492 },
-"Portugal": { lat: 39.3999, lon: -8.2245 },
-"Brazil": { lat: -14.2350, lon: -51.9253 },
-"Mexico": { lat: 23.6345, lon: -102.5528 },
-"Philippines": { lat: 12.8797, lon: 121.7740 },
-"Poland": { lat: 51.9194, lon: 19.1451 },
-"Germany": { lat: 51.1657, lon: 10.4515 },
-"United States": { lat: 37.0902, lon: -95.7129 },
-"France": { lat: 46.2276, lon: 2.2137 },
-"Egypt": { lat: 26.8206, lon: 30.8025 },
-"Pakistan": { lat: 30.3753, lon: 69.3451 },
-"Bangladesh": { lat: 23.6850, lon: 90.3563 },
-"Indonesia": { lat: -0.7893, lon: 113.9213 },
-"Nigeria": { lat: 9.0820, lon: 8.6753 },
-"Turkey": { lat: 38.9637, lon: 35.2433 },
-"Iran": { lat: 32.4279, lon: 53.6880 },
-"Saudi Arabia": { lat: 23.8859, lon: 45.0792 },
-"Morocco": { lat: 31.7917, lon: -7.0926 },
-"Algeria": { lat: 28.0339, lon: 1.6596 },
-"China": { lat: 35.8617, lon: 104.1954 },
-"Taiwan": { lat: 23.6978, lon: 120.9605 },
-"Singapore": { lat: 1.3521, lon: 103.8198 },
-"Malaysia": { lat: 4.2105, lon: 101.9758 },
-"Canada": { lat: 56.1304, lon: -106.3468 },
-"Australia": { lat: -25.2744, lon: 133.7751 },
-"United Kingdom": { lat: 55.3781, lon: -3.4360 },
-"Russia": { lat: 61.5240, lon: 105.3188 },
-"Ukraine": { lat: 48.3794, lon: 31.1656 },
-"Argentina": { lat: -38.4161, lon: -63.6167 },
-"Ireland": { lat: 53.4129, lon: -8.2439 },
-"South Africa": { lat: -30.5595, lon: 22.9375 },
-"New Zealand": { lat: -40.9006, lon: 174.8860 },
-"Kenya": { lat: -0.0236, lon: 37.9062 }
-};
-
-// Add markers for each country in distribution
-Object.keys(distribution).forEach(country => {
-if (countryCoords[country]) {
-const coords = countryCoords[country];
-const intensity = distribution[country] / 100; // Normalize to 0-1
-
-// Convert lat/lon to 3D position
-const phi = (90 - coords.lat) * (Math.PI / 180);
-const theta = (coords.lon + 180) * (Math.PI / 180);
-
-const radius = 102; // Slightly above globe surface
-const x = -(radius * Math.sin(phi) * Math.cos(theta));
-const y = radius * Math.cos(phi);
-const z = radius * Math.sin(phi) * Math.sin(theta);
-
-// Create marker (small sphere)
-const markerGeometry = new THREE.SphereGeometry(1.5 + intensity * 3, 8, 8);
-const markerMaterial = new THREE.MeshBasicMaterial({
-color: 0xffdd00,
-transparent: true,
-opacity: 0.7
-});
-const marker = new THREE.Mesh(markerGeometry, markerMaterial);
-marker.position.set(x, y, z);
-
-scene.add(marker);
-nameMarkers.push(marker);
-}
-});
-}
-
-// Clear markers from globe
-function clearMarkers() {
-nameMarkers.forEach(marker => scene.remove(marker));
-nameMarkers = [];
 }
 
 // Play pronunciation audio
@@ -1365,14 +1452,12 @@ if ('speechSynthesis' in window) {
 const utterance = new SpeechSynthesisUtterance(name);
 
 // Try to set appropriate language based on name origin
-if (nameData.origins.includes("Chinese")) {
-utterance.lang = 'zh-CN';
-} else if (nameData.origins.includes("Arabic")) {
-utterance.lang = 'ar-SA';
+if (nameData.origins.includes("French")) {
+utterance.lang = 'fr-FR';
 } else if (nameData.origins.includes("Spanish")) {
 utterance.lang = 'es-ES';
-} else if (nameData.origins.includes("Russian")) {
-utterance.lang = 'ru-RU';
+} else if (nameData.origins.includes("German")) {
+utterance.lang = 'de-DE';
 } else {
 utterance.lang = 'en-US';
 }
@@ -1396,19 +1481,9 @@ speechSynthesis.speak(utterance);
 // Fallback if Web Speech API is not available
 audioBtn.classList.remove('playing');
 loadingEl.style.display = 'none';
-alert(`Pronunciation: ${nameData.pronunciation}. Your browser doesn't support audio playback. Please use the external links for audio pronunciation.`);
+alert(`Pronunciation: ${nameData.pronunciation}. Your browser doesn't support audio playback.`);
 }
 }
-
-// Performance optimization: Clean up on page unload
-window.addEventListener('beforeunload', () => {
-if (animationId) {
-cancelAnimationFrame(animationId);
-}
-if ('speechSynthesis' in window) {
-speechSynthesis.cancel();
-}
-});
 
 // Initialize the application when the page loads
 window.addEventListener('load', init);
