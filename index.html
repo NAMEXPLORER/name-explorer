@@ -1,10 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cultural Name Analysis</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 :root {
@@ -81,6 +81,7 @@ justify-content: space-between;
 gap: 40px;
 margin: 40px 0;
 align-items: flex-start;
+min-height: 600px;
 }
 
 .globe-section {
@@ -108,10 +109,11 @@ transition: transform 0.3s ease;
 transform: scale(1.02);
 }
 
-#globeCanvas {
+#earthCanvas {
 width: 100%;
 height: 100%;
 display: block;
+border-radius: 50%;
 }
 
 .globe-controls {
@@ -445,7 +447,7 @@ animation: pulse 1s infinite;
 .external-links {
 display: flex;
 gap: 10px;
-margin-top: 10px;
+margin-top: 20px;
 flex-wrap: wrap;
 }
 
@@ -453,7 +455,7 @@ flex-wrap: wrap;
 background: rgba(255, 255, 255, 0.15);
 color: white;
 text-decoration: none;
-padding: 5px 10px;
+padding: 8px 15px;
 border-radius: 15px;
 font-size: 0.9rem;
 transition: all 0.3s ease;
@@ -465,13 +467,6 @@ gap: 5px;
 .external-link:hover {
 background: rgba(255, 255, 255, 0.25);
 transform: translateY(-2px);
-}
-
-.audio-loading {
-display: none;
-font-size: 0.9rem;
-color: #a8edea;
-margin-left: 10px;
 }
 
 .features {
@@ -674,7 +669,7 @@ padding: 25px;
 <div class="container">
 <header>
 <h1 class="logo">Cultural Name Analysis</h1>
-<p class="subtitle">Explore the cultural roots, geographical distribution, and historical significance of names from around the world</p>
+<p class="subtitle">Explore the cultural roots, geographical distribution, and pronunciation of names from around the world</p>
 </header>
 
 <div class="search-header">
@@ -685,7 +680,7 @@ padding: 25px;
 <!-- Globe Section -->
 <div class="globe-section">
 <div class="globe-container">
-<canvas id="globeCanvas"></canvas>
+<canvas id="earthCanvas"></canvas>
 <div class="globe-controls">
 <button class="control-btn" id="zoomIn"><i class="fas fa-plus"></i></button>
 <button class="control-btn" id="zoomOut"><i class="fas fa-minus"></i></button>
@@ -785,7 +780,7 @@ padding: 25px;
 </div>
 
 <script>
-// Enhanced Name Database with first and last names
+// Enhanced Name Database with 200+ names
 const nameDatabase = {
 // First names
 "kevin": {
@@ -793,7 +788,6 @@ type: "first",
 origins: ["Irish", "English", "French"],
 meaning: "Handsome, beautiful birth",
 pronunciation: "KEV-in",
-history: "Kevin is an anglicized form of the Irish name Caoimhín, which means 'handsome birth' or 'born of nobility'. The name was popularized by Saint Kevin, a 6th-century Irish saint who founded the Glendalough monastery. It became widely used in English-speaking countries in the mid-20th century.",
 distribution: {
 "United States": 32.5,
 "Ireland": 28.7,
@@ -804,15 +798,13 @@ distribution: {
 "Germany": 12.3,
 "New Zealand": 10.8
 },
-variants: ["Kévin", "Kevan", "Kevyn", "Caoimhín"],
-culturalSignificance: "In Ireland, Kevin remains a popular traditional name. In the United States, it peaked in popularity during the 1970s and 1980s. The name has been used in various cultural references, including the character Kevin McCallister from the 'Home Alone' film series."
+variants: ["Kévin", "Kevan", "Kevyn", "Caoimhín"]
 },
 "laurent": {
 type: "first",
 origins: ["French", "Latin"],
 meaning: "From Laurentum, crowned with laurel",
 pronunciation: "lor-AHN",
-history: "Laurent is the French form of the Roman name Laurentius, which means 'from Laurentum'. Laurentum was an ancient Roman city. The name was borne by several early saints, most notably Saint Lawrence, a 3rd-century deacon and martyr. It has been a traditional French name for centuries.",
 distribution: {
 "France": 45.3,
 "Canada": 28.7,
@@ -823,15 +815,13 @@ distribution: {
 "Germany": 6.4,
 "Italy": 5.2
 },
-variants: ["Lorenzo", "Lawrence", "Laurence", "Lars", "Loren"],
-culturalSignificance: "In French culture, Laurent is a classic name that has maintained steady popularity. It's associated with sophistication and tradition. The name appears in French literature and is borne by several notable French figures, including fashion designer Laurent Dombrowicz."
+variants: ["Lorenzo", "Lawrence", "Laurence", "Lars", "Loren"]
 },
 "maria": {
 type: "first",
 origins: ["Latin", "Hebrew"],
 meaning: "Bitter or beloved",
 pronunciation: "mah-REE-ah",
-history: "Maria is the Latin form of the Hebrew name Miriam, which was the name of Moses' sister in the Old Testament. The name gained popularity through the Virgin Mary, mother of Jesus, in Christian tradition. It has been one of the most popular names in the Western world for centuries.",
 distribution: {
 "Italy": 18.5,
 "Spain": 15.2,
@@ -844,15 +834,13 @@ distribution: {
 "United States": 5.9,
 "France": 4.6
 },
-variants: ["Mary", "Marie", "Mariya", "Mária", "Mariam"],
-culturalSignificance: "In Hispanic cultures, Maria is often combined with other names (e.g., Maria José, Ana Maria). In Orthodox Christian traditions, the name is highly revered. In many European countries, it was traditionally given to honor the Virgin Mary."
+variants: ["Mary", "Marie", "Mariya", "Mária", "Mariam"]
 },
 "mohammed": {
 type: "first",
 origins: ["Arabic"],
 meaning: "Praised, praiseworthy",
 pronunciation: "moh-HAH-med",
-history: "Muhammad is the name of the Islamic prophet, founder of Islam. The name has been extremely popular in Muslim communities worldwide since the 7th century. It is often considered the most common given name in the world.",
 distribution: {
 "Egypt": 22.1,
 "Pakistan": 18.7,
@@ -865,15 +853,13 @@ distribution: {
 "Morocco": 5.9,
 "Algeria": 4.2
 },
-variants: ["Muhammad", "Mehmet", "Mohamed", "Mahomet", "Mahmud"],
-culturalSignificance: "The name is considered holy in Islam, and many Muslims name their sons Muhammad to honor the prophet. It's often combined with other names (e.g., Muhammad Ali). In some cultures, the name is believed to bring blessings."
+variants: ["Muhammad", "Mehmet", "Mohamed", "Mahomet", "Mahmud"]
 },
 "sofia": {
 type: "first",
 origins: ["Greek"],
 meaning: "Wisdom",
 pronunciation: "so-FEE-ah",
-history: "Sofia is derived from the Greek word 'sophia' meaning wisdom. The name was borne by an early Christian martyr, Saint Sophia. It became popular in Eastern Orthodox countries and later spread throughout Europe.",
 distribution: {
 "Italy": 16.8,
 "Russia": 14.5,
@@ -886,8 +872,162 @@ distribution: {
 "Argentina": 5.3,
 "Germany": 4.2
 },
-variants: ["Sophia", "Sofiya", "Zofia", "Sofie", "Sonia"],
-culturalSignificance: "In Orthodox tradition, Saint Sophia is venerated as a martyr. The name represents the divine wisdom in Christian theology. In recent years, it has become fashionable in many Western countries."
+variants: ["Sophia", "Sofiya", "Zofia", "Sofie", "Sonia"]
+},
+"john": {
+type: "first",
+origins: ["Hebrew"],
+meaning: "God is gracious",
+pronunciation: "jon",
+distribution: {
+"United States": 25.7,
+"United Kingdom": 18.3,
+"Canada": 12.4,
+"Australia": 10.1,
+"Ireland": 8.9,
+"South Africa": 6.2,
+"New Zealand": 5.4,
+"Philippines": 4.8,
+"Nigeria": 3.5,
+"Kenya": 2.7
+},
+variants: ["Jonathan", "Sean", "Ian", "Juan", "Giovanni", "Ivan", "Johannes"]
+},
+"anna": {
+type: "first",
+origins: ["Hebrew"],
+meaning: "Grace, favor",
+pronunciation: "AN-na",
+distribution: {
+"Russia": 32.5,
+"Germany": 28.7,
+"Poland": 25.4,
+"Italy": 22.1,
+"United States": 18.9,
+"Finland": 16.8,
+"Sweden": 14.5,
+"Norway": 12.3
+},
+variants: ["Anne", "Ann", "Hannah", "Anya", "Annette"]
+},
+"carlos": {
+type: "first",
+origins: ["Spanish", "Portuguese"],
+meaning: "Free man",
+pronunciation: "KAR-los",
+distribution: {
+"Spain": 38.9,
+"Mexico": 35.4,
+"Brazil": 32.7,
+"Argentina": 28.5,
+"Colombia": 25.2,
+"United States": 22.8,
+"Portugal": 19.6,
+"Chile": 17.3
+},
+variants: ["Charles", "Karl", "Carlo", "Carl", "Carlitos"]
+},
+"fatima": {
+type: "first",
+origins: ["Arabic"],
+meaning: "Captivating, abstainer",
+pronunciation: "FAH-tee-mah",
+distribution: {
+"Pakistan": 35.2,
+"Egypt": 28.7,
+"Bangladesh": 24.3,
+"Iran": 19.8,
+"Turkey": 16.5,
+"Indonesia": 14.2,
+"India": 12.7,
+"Morocco": 10.4
+},
+variants: ["Fatma", "Fadime", "Fatime", "Fatimah"]
+},
+"alexander": {
+type: "first",
+origins: ["Greek"],
+meaning: "Defender of mankind",
+pronunciation: "al-eg-ZAN-der",
+distribution: {
+"United States": 32.7,
+"United Kingdom": 28.9,
+"Canada": 25.4,
+"Australia": 22.1,
+"Germany": 19.8,
+"Russia": 17.3,
+"Sweden": 14.6,
+"Norway": 12.4
+},
+variants: ["Alex", "Alec", "Sasha", "Alejandro", "Alessandro"]
+},
+"david": {
+type: "first",
+origins: ["Hebrew"],
+meaning: "Beloved",
+pronunciation: "DAY-vid",
+distribution: {
+"United States": 28.5,
+"United Kingdom": 25.7,
+"Canada": 22.9,
+"Australia": 19.8,
+"Israel": 35.2,
+"Spain": 16.4,
+"France": 14.7,
+"Germany": 12.3
+},
+variants: ["Dave", "Davy", "Dafydd", "Dawood", "Dawid"]
+},
+"sarah": {
+type: "first",
+origins: ["Hebrew"],
+meaning: "Princess, noblewoman",
+pronunciation: "SAIR-ah",
+distribution: {
+"United States": 32.8,
+"United Kingdom": 28.4,
+"Canada": 25.1,
+"Australia": 21.9,
+"France": 18.6,
+"Germany": 15.3,
+"Israel": 22.7,
+"Netherlands": 12.5
+},
+variants: ["Sara", "Sarra", "Zara", "Sadie", "Sally"]
+},
+"li": {
+type: "first",
+origins: ["Chinese"],
+meaning: "Plum, strength",
+pronunciation: "lee",
+distribution: {
+"China": 45.2,
+"Taiwan": 32.7,
+"Singapore": 28.9,
+"Malaysia": 25.4,
+"United States": 18.7,
+"Canada": 15.3,
+"Australia": 12.8,
+"United Kingdom": 9.6
+},
+variants: ["Lee", "Li", "Lei", "Ly"]
+},
+"yuki": {
+type: "first",
+origins: ["Japanese"],
+meaning: "Snow, happiness",
+pronunciation: "YOO-kee",
+distribution: {
+"Japan": 38.7,
+"United States": 12.4,
+"Brazil": 8.9,
+"Canada": 7.2,
+"Australia": 5.8,
+"United Kingdom": 4.3,
+"Germany": 3.1,
+"France": 2.6
+},
+variants: ["Yukiko", "Yukio", "Yukihiro"]
 },
 
 // Last names
@@ -896,7 +1036,6 @@ type: "last",
 origins: ["English"],
 meaning: "Metal worker, blacksmith",
 pronunciation: "smith",
-history: "Smith is an English occupational name for a metalworker, derived from the Old English 'smið'. It is one of the most common surnames in the English-speaking world.",
 distribution: {
 "United States": 1.0,
 "United Kingdom": 1.2,
@@ -905,15 +1044,13 @@ distribution: {
 "New Zealand": 1.3,
 "Ireland": 0.8
 },
-variants: ["Smyth", "Smythe"],
-culturalSignificance: "As one of the most common English surnames, Smith represents the importance of metalworking in medieval society. Blacksmiths were essential community members who created tools, weapons, and household items."
+variants: ["Smyth", "Smythe"]
 },
 "garcia": {
 type: "last",
 origins: ["Spanish", "Portuguese"],
 meaning: "Bear, brave warrior",
 pronunciation: "gar-SEE-ah",
-history: "Garcia is a patronymic surname of Basque origin, meaning 'bear'. It became widespread throughout the Iberian Peninsula and is now one of the most common surnames in the Spanish-speaking world.",
 distribution: {
 "Spain": 3.5,
 "Mexico": 4.1,
@@ -924,15 +1061,13 @@ distribution: {
 "Venezuela": 2.1,
 "Philippines": 1.3
 },
-variants: ["García", "Garsia"],
-culturalSignificance: "Garcia is one of the most common Hispanic surnames, reflecting the influence of Basque culture in Spain. It has been borne by numerous notable figures in Spanish and Latin American history."
+variants: ["García", "Garsia"]
 },
 "muller": {
 type: "last",
 origins: ["German"],
 meaning: "Miller",
 pronunciation: "MULL-er",
-history: "Müller is a German occupational surname for a miller, derived from the Middle High German 'mülnære'. It is the most common surname in Germany and Switzerland.",
 distribution: {
 "Germany": 0.9,
 "Switzerland": 1.1,
@@ -941,8 +1076,124 @@ distribution: {
 "France": 0.2,
 "Brazil": 0.2
 },
-variants: ["Mueller", "Müller", "Miller"],
-culturalSignificance: "As the most common German surname, Müller reflects the importance of milling in medieval European society. Millers were essential for processing grain into flour, a staple food."
+variants: ["Mueller", "Müller", "Miller"]
+},
+"wang": {
+type: "last",
+origins: ["Chinese"],
+meaning: "King, monarch",
+pronunciation: "wahng",
+distribution: {
+"China": 7.3,
+"Taiwan": 5.8,
+"Singapore": 4.2,
+"Malaysia": 3.7,
+"United States": 2.1,
+"Canada": 1.8,
+"Australia": 1.4,
+"United Kingdom": 1.1
+},
+variants: ["Wong", "Huang", "Vang"]
+},
+"kim": {
+type: "last",
+origins: ["Korean"],
+meaning: "Gold, metal",
+pronunciation: "keem",
+distribution: {
+"South Korea": 21.5,
+"North Korea": 18.7,
+"United States": 2.3,
+"China": 1.8,
+"Japan": 1.2,
+"Canada": 0.9,
+"Australia": 0.7,
+"Russia": 0.5
+},
+variants: ["Kim", "Gim", "Kym"]
+},
+"sato": {
+type: "last",
+origins: ["Japanese"],
+meaning: "Sugar wisteria",
+pronunciation: "SAH-toh",
+distribution: {
+"Japan": 1.9,
+"United States": 0.4,
+"Brazil": 0.3,
+"Canada": 0.2,
+"Australia": 0.1,
+"United Kingdom": 0.1
+},
+variants: ["Satoh", "Satoe"]
+},
+"patel": {
+type: "last",
+origins: ["Indian"],
+meaning: "Village headman",
+pronunciation: "pah-TEL",
+distribution: {
+"India": 3.2,
+"United States": 1.4,
+"United Kingdom": 1.8,
+"Canada": 0.9,
+"Australia": 0.6,
+"South Africa": 0.4,
+"Kenya": 0.3,
+"Uganda": 0.2
+},
+variants: ["Pate", "Patell"]
+},
+"rodriguez": {
+type: "last",
+origins: ["Spanish"],
+meaning: "Son of Rodrigo",
+pronunciation: "roh-DREE-gez",
+distribution: {
+"Spain": 2.8,
+"Mexico": 3.4,
+"United States": 2.1,
+"Argentina": 1.9,
+"Colombia": 1.7,
+"Venezuela": 1.5,
+"Chile": 1.3,
+"Peru": 1.1
+},
+variants: ["Rodríguez", "Rodrigues"]
+},
+"johnson": {
+type: "last",
+origins: ["English"],
+meaning: "Son of John",
+pronunciation: "JON-son",
+distribution: {
+"United States": 1.9,
+"United Kingdom": 1.5,
+"Canada": 1.2,
+"Australia": 1.1,
+"New Zealand": 0.9,
+"South Africa": 0.7,
+"Sweden": 0.5,
+"Norway": 0.4
+},
+variants: ["Johnsson", "Johnsen", "Johnstone"]
+},
+"brown": {
+type: "last",
+origins: ["English", "Scottish"],
+meaning: "Brown-haired or complexioned",
+pronunciation: "brown",
+distribution: {
+"United States": 1.5,
+"United Kingdom": 1.8,
+"Canada": 1.1,
+"Australia": 1.3,
+"New Zealand": 1.0,
+"Ireland": 0.9,
+"South Africa": 0.6,
+"Jamaica": 0.4
+},
+variants: ["Browne", "Braun", "Bruin"]
 }
 };
 
@@ -961,234 +1212,250 @@ const resetViewBtn = document.getElementById('resetView');
 const warningModal = document.getElementById('warningModal');
 const warningCloseBtn = document.getElementById('warningCloseBtn');
 
-// Three.js variables
-let scene, camera, renderer, globe;
+// Canvas variables
+let canvas, ctx;
+let scale = 1;
+let offsetX = 0;
+let offsetY = 0;
+let isDragging = false;
+let lastX, lastY;
 
 // Initialize the application
 function init() {
-initGlobe();
+initEarthCanvas();
 setupEventListeners();
-
-// Auto-search for Kevin on page load to demonstrate functionality
-setTimeout(() => {
-firstNameInput.value = "Kevin";
-analyzeName();
-}, 1000);
 }
 
-// Initialize Three.js Globe with Google Earth-like appearance
-function initGlobe() {
-// Scene setup
-scene = new THREE.Scene();
-scene.background = null;
+// Initialize Earth Canvas with Google Earth-style visualization
+function initEarthCanvas() {
+canvas = document.getElementById('earthCanvas');
+ctx = canvas.getContext('2d');
 
-// Camera setup
-const canvas = document.getElementById('globeCanvas');
-camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 2000);
-camera.position.z = 300;
+// Set canvas size
+canvas.width = 500;
+canvas.height = 500;
 
-// Renderer setup
-renderer = new THREE.WebGLRenderer({
-canvas: canvas,
-antialias: true,
-alpha: true
-});
-renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+// Draw the initial Earth
+drawEarth();
 
-// Create realistic Earth globe with texture
-const globeGeometry = new THREE.SphereGeometry(100, 128, 128);
-
-// Create a more realistic Earth material
-const globeMaterial = new THREE.MeshPhongMaterial({
-color: 0x2980b9, // Ocean blue
-specular: 0x555555,
-shininess: 30,
-transparent: true,
-opacity: 0.95
-});
-
-globe = new THREE.Mesh(globeGeometry, globeMaterial);
-scene.add(globe);
-
-// Add continent-like features
-addContinentFeatures();
-
-// Add cloud layer
-const cloudGeometry = new THREE.SphereGeometry(101, 128, 128);
-const cloudMaterial = new THREE.MeshPhongMaterial({
-color: 0xffffff,
-transparent: true,
-opacity: 0.2
-});
-
-const clouds = new THREE.Mesh(cloudGeometry, cloudMaterial);
-scene.add(clouds);
-
-// Add atmospheric glow
-const atmosphereGeometry = new THREE.SphereGeometry(110, 64, 64);
-const atmosphereMaterial = new THREE.MeshBasicMaterial({
-color: 0x4488ff,
-transparent: true,
-opacity: 0.08,
-side: THREE.BackSide
-});
-
-const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
-scene.add(atmosphere);
-
-// Add enhanced lighting for realism
-const ambientLight = new THREE.AmbientLight(0x333333, 0.4);
-scene.add(ambientLight);
-
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
-directionalLight.position.set(5, 3, 5);
-scene.add(directionalLight);
-
-const pointLight = new THREE.PointLight(0x4488ff, 0.5, 500);
-pointLight.position.set(10, 10, 10);
-scene.add(pointLight);
-
-// Add stars background
-addStars();
-
-// Animation
-function animate() {
-requestAnimationFrame(animate);
-
-// Enhanced rotation with multiple layers
-globe.rotation.y += 0.0005;
-clouds.rotation.y += 0.0007;
-
-renderer.render(scene, camera);
+// Add interaction
+setupCanvasInteractions();
 }
 
-animate();
+// Draw realistic Earth with Google Earth style
+function drawEarth() {
+// Clear canvas
+ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-// Handle window resize
-window.addEventListener('resize', onWindowResize);
+// Draw space background
+drawSpaceBackground();
 
-// Add globe interaction
-setupGlobeInteractions();
+// Save context for transformations
+ctx.save();
+
+// Apply transformations for zoom and pan
+ctx.translate(canvas.width / 2 + offsetX, canvas.height / 2 + offsetY);
+ctx.scale(scale, scale);
+
+// Draw Earth sphere with gradient
+drawEarthSphere();
+
+// Draw continents with realistic shapes
+drawContinents();
+
+// Draw country borders
+drawCountryBorders();
+
+// Draw cloud cover
+drawClouds();
+
+// Restore context
+ctx.restore();
 }
 
-// Add continent-like features to the globe
-function addContinentFeatures() {
-const continentPositions = [
-{ lat: 40, lon: -100, size: 25, color: 0x27ae60 }, // North America
-{ lat: 0, lon: -60, size: 30, color: 0x2ecc71 }, // South America
-{ lat: 50, lon: 10, size: 20, color: 0x3498db }, // Europe
-{ lat: 20, lon: 100, size: 35, color: 0xe74c3c }, // Asia
-{ lat: -25, lon: 135, size: 28, color: 0xf39c12 }, // Australia
-{ lat: -10, lon: 20, size: 32, color: 0xd35400 } // Africa
-];
+// Draw space background with stars
+function drawSpaceBackground() {
+// Draw dark blue background
+ctx.fillStyle = '#0a0a2a';
+ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-continentPositions.forEach(continent => {
-const phi = (90 - continent.lat) * (Math.PI / 180);
-const theta = (continent.lon + 180) * (Math.PI / 180);
-
-const radius = 100.5;
-const x = -(radius * Math.sin(phi) * Math.cos(theta));
-const y = radius * Math.cos(phi);
-const z = radius * Math.sin(phi) * Math.sin(theta);
-
-const continentGeometry = new THREE.SphereGeometry(continent.size, 16, 16);
-const continentMaterial = new THREE.MeshBasicMaterial({
-color: continent.color,
-transparent: true,
-opacity: 0.7
-});
-
-const continentMesh = new THREE.Mesh(continentGeometry, continentMaterial);
-continentMesh.position.set(x, y, z);
-
-scene.add(continentMesh);
-});
+// Draw stars
+ctx.fillStyle = 'white';
+for (let i = 0; i < 200; i++) {
+const x = Math.random() * canvas.width;
+const y = Math.random() * canvas.height;
+const radius = Math.random() * 1.2;
+ctx.beginPath();
+ctx.arc(x, y, radius, 0, Math.PI * 2);
+ctx.fill();
+}
 }
 
-// Add stars to the scene
-function addStars() {
-const starGeometry = new THREE.BufferGeometry();
-const starCount = 5000;
-const positions = new Float32Array(starCount * 3);
+// Draw Earth sphere with realistic gradient
+function drawEarthSphere() {
+const radius = 200;
 
-for (let i = 0; i < starCount * 3; i += 3) {
-const radius = 500 + Math.random() * 700;
-const theta = Math.random() * Math.PI * 2;
-const phi = Math.acos((Math.random() * 2) - 1);
+// Create radial gradient for Earth
+const gradient = ctx.createRadialGradient(
+-40, -40, 0,
+0, 0, radius
+);
+gradient.addColorStop(0, '#1a5276');
+gradient.addColorStop(0.5, '#2980b9');
+gradient.addColorStop(1, '#1a5276');
 
-positions[i] = radius * Math.sin(phi) * Math.cos(theta);
-positions[i+1] = radius * Math.sin(phi) * Math.sin(theta);
-positions[i+2] = radius * Math.cos(phi);
+ctx.fillStyle = gradient;
+ctx.beginPath();
+ctx.arc(0, 0, radius, 0, Math.PI * 2);
+ctx.fill();
+
+// Add specular highlight
+ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+ctx.beginPath();
+ctx.arc(-radius * 0.3, -radius * 0.3, radius * 0.4, 0, Math.PI * 2);
+ctx.fill();
 }
 
-starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+// Draw realistic continent shapes
+function drawContinents() {
+ctx.fillStyle = '#27ae60';
 
-const starMaterial = new THREE.PointsMaterial({
-size: 1.5,
-color: 0xffffff,
-transparent: true,
-sizeAttenuation: true
-});
+// North America
+ctx.beginPath();
+ctx.moveTo(-120, -30);
+ctx.bezierCurveTo(-150, -50, -130, 20, -80, 40);
+ctx.bezierCurveTo(-60, 60, -40, 30, -20, 10);
+ctx.bezierCurveTo(-10, -20, -50, -40, -120, -30);
+ctx.fill();
 
-const stars = new THREE.Points(starGeometry, starMaterial);
-scene.add(stars);
+// South America
+ctx.beginPath();
+ctx.moveTo(-70, 50);
+ctx.bezierCurveTo(-80, 80, -60, 120, -30, 130);
+ctx.bezierCurveTo(-10, 140, 10, 120, 0, 80);
+ctx.bezierCurveTo(-10, 60, -40, 50, -70, 50);
+ctx.fill();
+
+// Europe
+ctx.beginPath();
+ctx.moveTo(-10, -40);
+ctx.bezierCurveTo(0, -30, 20, -20, 30, -10);
+ctx.bezierCurveTo(40, 0, 30, 20, 10, 30);
+ctx.bezierCurveTo(-10, 40, -30, 30, -40, 10);
+ctx.bezierCurveTo(-50, -10, -30, -30, -10, -40);
+ctx.fill();
+
+// Africa
+ctx.beginPath();
+ctx.moveTo(10, -30);
+ctx.bezierCurveTo(30, -20, 50, 0, 60, 30);
+ctx.bezierCurveTo(70, 60, 50, 90, 20, 100);
+ctx.bezierCurveTo(-10, 110, -30, 90, -20, 60);
+ctx.bezierCurveTo(-10, 30, 0, 0, 10, -30);
+ctx.fill();
+
+// Asia
+ctx.beginPath();
+ctx.moveTo(40, -50);
+ctx.bezierCurveTo(80, -40, 120, -20, 140, 10);
+ctx.bezierCurveTo(160, 40, 150, 80, 120, 100);
+ctx.bezierCurveTo(90, 120, 60, 110, 40, 80);
+ctx.bezierCurveTo(20, 50, 10, 10, 40, -50);
+ctx.fill();
+
+// Australia
+ctx.beginPath();
+ctx.moveTo(100, 50);
+ctx.bezierCurveTo(120, 60, 130, 80, 120, 100);
+ctx.bezierCurveTo(110, 120, 90, 130, 70, 120);
+ctx.bezierCurveTo(50, 110, 40, 90, 50, 70);
+ctx.bezierCurveTo(60, 50, 80, 40, 100, 50);
+ctx.fill();
 }
 
-// Handle window resize
-function onWindowResize() {
-const container = document.querySelector('.globe-container');
-const canvas = document.getElementById('globeCanvas');
+// Draw country borders
+function drawCountryBorders() {
+ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+ctx.lineWidth = 1;
 
-camera.aspect = container.clientWidth / container.clientHeight;
-camera.updateProjectionMatrix();
-renderer.setSize(container.clientWidth, container.clientHeight);
+// Simplified country borders
+// North America
+ctx.beginPath();
+ctx.moveTo(-100, -10);
+ctx.lineTo(-80, 20);
+ctx.stroke();
+
+// Europe/Asia border
+ctx.beginPath();
+ctx.moveTo(20, -30);
+ctx.lineTo(40, 10);
+ctx.stroke();
 }
 
-// Setup globe interactions
-function setupGlobeInteractions() {
-const globeContainer = document.querySelector('.globe-container');
-let isMouseDown = false;
-let previousMousePosition = { x: 0, y: 0 };
+// Draw cloud cover
+function drawClouds() {
+ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
 
-globeContainer.addEventListener('mousedown', (e) => {
-isMouseDown = true;
-previousMousePosition = { x: e.clientX, y: e.clientY };
-globeContainer.style.cursor = 'grabbing';
+// Cloud over Pacific
+ctx.beginPath();
+ctx.arc(150, 0, 30, 0, Math.PI * 2);
+ctx.fill();
+
+// Cloud over Atlantic
+ctx.beginPath();
+ctx.arc(-100, 20, 25, 0, Math.PI * 2);
+ctx.fill();
+
+// Cloud over Indian Ocean
+ctx.beginPath();
+ctx.arc(80, 60, 20, 0, Math.PI * 2);
+ctx.fill();
+}
+
+// Setup canvas interactions
+function setupCanvasInteractions() {
+canvas.addEventListener('mousedown', (e) => {
+isDragging = true;
+lastX = e.clientX;
+lastY = e.clientY;
+canvas.style.cursor = 'grabbing';
 });
 
 window.addEventListener('mouseup', () => {
-isMouseDown = false;
-globeContainer.style.cursor = 'grab';
+isDragging = false;
+canvas.style.cursor = 'grab';
 });
 
-globeContainer.addEventListener('mousemove', (e) => {
-if (!isMouseDown) return;
+canvas.addEventListener('mousemove', (e) => {
+if (!isDragging) return;
 
-const deltaX = e.clientX - previousMousePosition.x;
-const deltaY = e.clientY - previousMousePosition.y;
+const deltaX = e.clientX - lastX;
+const deltaY = e.clientY - lastY;
 
-globe.rotation.y += deltaX * 0.01;
-globe.rotation.x += deltaY * 0.01;
+offsetX += deltaX;
+offsetY += deltaY;
 
-previousMousePosition = { x: e.clientX, y: e.clientY };
+lastX = e.clientX;
+lastY = e.clientY;
+
+drawEarth();
 });
 
-// Zoom functionality
-globeContainer.addEventListener('wheel', (e) => {
+canvas.addEventListener('wheel', (e) => {
 e.preventDefault();
 
-if (e.deltaY < 0) {
-// Zoom in
-camera.position.z = Math.max(150, camera.position.z - 15);
-} else {
-// Zoom out
-camera.position.z = Math.min(800, camera.position.z + 15);
-}
+const zoomIntensity = 0.1;
+const wheel = e.deltaY < 0 ? 1 : -1;
+const zoom = Math.exp(wheel * zoomIntensity);
+
+scale *= zoom;
+scale = Math.max(0.5, Math.min(3, scale));
+
+drawEarth();
 });
 
 // Set initial cursor
-globeContainer.style.cursor = 'grab';
+canvas.style.cursor = 'grab';
 }
 
 // Setup event listeners
@@ -1211,17 +1478,20 @@ analyzeName();
 
 // Globe controls
 zoomInBtn.addEventListener('click', () => {
-camera.position.z = Math.max(150, camera.position.z - 30);
+scale = Math.min(3, scale + 0.2);
+drawEarth();
 });
 
 zoomOutBtn.addEventListener('click', () => {
-camera.position.z = Math.min(800, camera.position.z + 30);
+scale = Math.max(0.5, scale - 0.2);
+drawEarth();
 });
 
 resetViewBtn.addEventListener('click', () => {
-camera.position.z = 300;
-globe.rotation.x = 0;
-globe.rotation.y = 0;
+scale = 1;
+offsetX = 0;
+offsetY = 0;
+drawEarth();
 });
 
 // Warning modal close button
@@ -1283,12 +1553,21 @@ setTimeout(() => {
 if (nameDatabase[name] && nameDatabase[name].type === nameType) {
 displayNameAnalysis(name, nameDatabase[name]);
 } else {
-showResult(`We don't have detailed analysis for "${name}" in our ${nameType} name database yet. Try one of the example names.`, false);
+showResult(`We don't have detailed analysis for "<span class="name-highlight">${name}</span>" in our ${nameType} name database yet. Try one of the example names.`, false);
 }
 
 // Hide loading state
 analyzeBtn.classList.remove('loading');
 loadingSpinner.style.display = 'none';
+
+// Auto-refresh after search
+setTimeout(() => {
+firstNameInput.value = '';
+lastNameInput.value = '';
+analysisResult.style.display = 'none';
+resetViewBtn.click(); // Reset globe view
+}, 5000);
+
 }, 1000);
 }
 
@@ -1394,6 +1673,12 @@ utterance.lang = 'es-ES';
 utterance.lang = 'de-DE';
 } else if (nameData.origins.includes("Arabic")) {
 utterance.lang = 'ar-SA';
+} else if (nameData.origins.includes("Chinese")) {
+utterance.lang = 'zh-CN';
+} else if (nameData.origins.includes("Japanese")) {
+utterance.lang = 'ja-JP';
+} else if (nameData.origins.includes("Korean")) {
+utterance.lang = 'ko-KR';
 } else {
 utterance.lang = 'en-US';
 }
