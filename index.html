@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Discover the cultural origins, geographical distribution, and historical significance of names from around the world.">
-<title>Cultural Name Analysis | Discover Your Name's Origins</title>
+<title>Cultural Name Analysis</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -56,12 +55,6 @@ background: linear-gradient(45deg, #fff, #a8edea);
 -webkit-background-clip: text;
 -webkit-text-fill-color: transparent;
 text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-}
-
-h1 {
-font-size: 2.5rem;
-margin-bottom: 15px;
-text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .subtitle {
@@ -144,6 +137,39 @@ transition: all 0.3s ease;
 .control-btn:hover {
 background: rgba(255, 255, 255, 0.3);
 transform: scale(1.1);
+}
+
+.ai-globe-controls {
+position: absolute;
+top: 20px;
+left: 50%;
+transform: translateX(-50%);
+background: rgba(0, 0, 0, 0.5);
+padding: 10px 20px;
+border-radius: 30px;
+display: flex;
+gap: 10px;
+backdrop-filter: blur(10px);
+z-index: 10;
+}
+
+.ai-btn {
+background: var(--accent);
+color: white;
+border: none;
+padding: 8px 15px;
+border-radius: 20px;
+font-size: 0.9rem;
+cursor: pointer;
+transition: all 0.3s ease;
+display: flex;
+align-items: center;
+gap: 5px;
+}
+
+.ai-btn:hover {
+background: #25a55f;
+transform: translateY(-2px);
 }
 
 .search-section {
@@ -438,6 +464,9 @@ padding: 5px 10px;
 border-radius: 15px;
 font-size: 0.9rem;
 transition: all 0.3s ease;
+display: flex;
+align-items: center;
+gap: 5px;
 }
 
 .external-link:hover {
@@ -601,7 +630,6 @@ padding: 25px;
 <div class="container">
 <header>
 <h1 class="logo">Cultural Name Analysis</h1>
-<h1>Discover Your Name's Global Origins</h1>
 <p class="subtitle">Explore the cultural roots, geographical distribution, and historical significance of names from around the world</p>
 </header>
 
@@ -610,6 +638,11 @@ padding: 25px;
 <div class="globe-section">
 <div class="globe-container">
 <canvas id="globeCanvas"></canvas>
+<div class="ai-globe-controls">
+<button class="ai-btn" id="generateAIGlobe">
+<i class="fas fa-robot"></i> AI Generate Globe
+</button>
+</div>
 <div class="globe-controls">
 <button class="control-btn" id="zoomIn"><i class="fas fa-plus"></i></button>
 <button class="control-btn" id="zoomOut"><i class="fas fa-minus"></i></button>
@@ -703,6 +736,7 @@ const loadingSpinner = document.getElementById('loadingSpinner');
 const zoomInBtn = document.getElementById('zoomIn');
 const zoomOutBtn = document.getElementById('zoomOut');
 const resetViewBtn = document.getElementById('resetView');
+const generateAIGlobeBtn = document.getElementById('generateAIGlobe');
 
 // Name Database with Cultural Analysis
 const nameDatabase = {
@@ -724,8 +758,7 @@ distribution: {
 "France": 4.6
 },
 variants: ["Mary", "Marie", "Mariya", "Mária", "Mariam"],
-culturalSignificance: "In Hispanic cultures, Maria is often combined with other names (e.g., Maria José, Ana Maria). In Orthodox Christian traditions, the name is highly revered. In many European countries, it was traditionally given to honor the Virgin Mary.",
-popularityTrend: "Consistently popular for centuries, with slight declines in some Western countries but remaining strong in Latin America and Catholic regions."
+culturalSignificance: "In Hispanic cultures, Maria is often combined with other names (e.g., Maria José, Ana Maria). In Orthodox Christian traditions, the name is highly revered. In many European countries, it was traditionally given to honor the Virgin Mary."
 },
 "mohammed": {
 origins: ["Arabic"],
@@ -745,8 +778,7 @@ distribution: {
 "Algeria": 4.2
 },
 variants: ["Muhammad", "Mehmet", "Mohamed", "Mahomet", "Mahmud"],
-culturalSignificance: "The name is considered holy in Islam, and many Muslims name their sons Muhammad to honor the prophet. It's often combined with other names (e.g., Muhammad Ali). In some cultures, the name is believed to bring blessings.",
-popularityTrend: "Rising globally with the growth of Muslim populations. Consistently among the top names in many Muslim-majority countries."
+culturalSignificance: "The name is considered holy in Islam, and many Muslims name their sons Muhammad to honor the prophet. It's often combined with other names (e.g., Muhammad Ali). In some cultures, the name is believed to bring blessings."
 },
 "wei": {
 origins: ["Chinese"],
@@ -764,8 +796,7 @@ distribution: {
 "United Kingdom": 0.3
 },
 variants: ["Weiwei", "Weiguo", "Weimin"],
-culturalSignificance: "In Chinese culture, the name Wei conveys aspirations for greatness and success. It's commonly given to boys but can be used for girls in combination with other characters. The name reflects Confucian values of virtue and accomplishment.",
-popularityTrend: "Consistently popular in Chinese-speaking communities. Growing use in Western countries with Chinese diaspora populations."
+culturalSignificance: "In Chinese culture, the name Wei conveys aspirations for greatness and success. It's commonly given to boys but can be used for girls in combination with other characters. The name reflects Confucian values of virtue and accomplishment."
 },
 "sofia": {
 origins: ["Greek"],
@@ -785,8 +816,7 @@ distribution: {
 "Germany": 4.2
 },
 variants: ["Sophia", "Sofiya", "Zofia", "Sofie", "Sonia"],
-culturalSignificance: "In Orthodox tradition, Saint Sophia is venerated as a martyr. The name represents the divine wisdom in Christian theology. In recent years, it has become fashionable in many Western countries.",
-popularityTrend: "Rising popularity since the 1990s, consistently ranking in top 10 names in many European and American countries in the 21st century."
+culturalSignificance: "In Orthodox tradition, Saint Sophia is venerated as a martyr. The name represents the divine wisdom in Christian theology. In recent years, it has become fashionable in many Western countries."
 },
 "john": {
 origins: ["Hebrew"],
@@ -806,8 +836,7 @@ distribution: {
 "Kenya": 2.7
 },
 variants: ["Jonathan", "Sean", "Ian", "Juan", "Giovanni", "Ivan", "Johannes"],
-culturalSignificance: "John has been the name of 23 popes and numerous kings and saints. It's often used as a generic name in English idioms (e.g., 'John Doe'). The name has maintained consistent popularity across centuries.",
-popularityTrend: "Historically extremely popular, with gradual decline since the mid-20th century but still commonly used. Remains a classic choice in English-speaking countries."
+culturalSignificance: "John has been the name of 23 popes and numerous kings and saints. It's often used as a generic name in English idioms (e.g., 'John Doe'). The name has maintained consistent popularity across centuries."
 }
 };
 
@@ -837,8 +866,8 @@ alpha: true
 renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-// Create the globe
-const globeGeometry = new THREE.SphereGeometry(100, 64, 64);
+// Create the globe with enhanced visuals
+const globeGeometry = new THREE.SphereGeometry(100, 128, 128);
 const globeMaterial = new THREE.MeshPhongMaterial({
 color: 0x1a2a6c,
 specular: 0x4488ff,
@@ -851,20 +880,20 @@ flatShading: false
 globe = new THREE.Mesh(globeGeometry, globeMaterial);
 scene.add(globe);
 
-// Add country outlines
-const outlineGeometry = new THREE.SphereGeometry(101, 64, 64);
+// Add enhanced country outlines
+const outlineGeometry = new THREE.SphereGeometry(101, 128, 128);
 const outlineMaterial = new THREE.MeshBasicMaterial({
 color: 0xffffff,
 wireframe: true,
 transparent: true,
-opacity: 0.15
+opacity: 0.1
 });
 
 const outline = new THREE.Mesh(outlineGeometry, outlineMaterial);
 scene.add(outline);
 
 // Add cloud layer for realism
-const cloudGeometry = new THREE.SphereGeometry(102, 64, 64);
+const cloudGeometry = new THREE.SphereGeometry(102, 128, 128);
 const cloudMaterial = new THREE.MeshPhongMaterial({
 color: 0xffffff,
 transparent: true,
@@ -875,40 +904,53 @@ specular: 0xffffff
 const clouds = new THREE.Mesh(cloudGeometry, cloudMaterial);
 scene.add(clouds);
 
-// Add atmospheric glow
-const atmosphereGeometry = new THREE.SphereGeometry(105, 64, 64);
+// Add enhanced atmospheric glow
+const atmosphereGeometry = new THREE.SphereGeometry(110, 64, 64);
 const atmosphereMaterial = new THREE.MeshBasicMaterial({
 color: 0x4488ff,
 transparent: true,
-opacity: 0.05,
+opacity: 0.08,
 side: THREE.BackSide
 });
 
 const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
 scene.add(atmosphere);
 
-// Add lights
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+// Add enhanced lighting
+const ambientLight = new THREE.AmbientLight(0x333333, 0.4);
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
 directionalLight.position.set(5, 3, 5);
 scene.add(directionalLight);
 
-// Add stars
+const pointLight = new THREE.PointLight(0x4488ff, 0.5, 500);
+pointLight.position.set(10, 10, 10);
+scene.add(pointLight);
+
+// Add enhanced stars background
 const starGeometry = new THREE.BufferGeometry();
-const starCount = 5000;
+const starCount = 8000;
 const positions = new Float32Array(starCount * 3);
 
-for (let i = 0; i < starCount * 3; i++) {
-positions[i] = (Math.random() - 0.5) * 2000;
+for (let i = 0; i < starCount * 3; i += 3) {
+// Random position in a sphere
+const radius = 800 + Math.random() * 1000;
+const theta = Math.random() * Math.PI * 2;
+const phi = Math.acos((Math.random() * 2) - 1);
+
+positions[i] = radius * Math.sin(phi) * Math.cos(theta);
+positions[i+1] = radius * Math.sin(phi) * Math.sin(theta);
+positions[i+2] = radius * Math.cos(phi);
 }
 
 starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
 const starMaterial = new THREE.PointsMaterial({
-color: 0xffffff,
 size: 1.5,
-transparent: true
+color: 0xffffff,
+transparent: true,
+sizeAttenuation: true
 });
 
 stars = new THREE.Points(starGeometry, starMaterial);
@@ -918,11 +960,12 @@ scene.add(stars);
 function animate() {
 animationId = requestAnimationFrame(animate);
 
-globe.rotation.y += 0.0005;
-outline.rotation.y += 0.0005;
-clouds.rotation.y += 0.0007;
-atmosphere.rotation.y += 0.0003;
-stars.rotation.y -= 0.0002;
+// Enhanced rotation with multiple layers
+globe.rotation.y += 0.0003;
+outline.rotation.y += 0.0003;
+clouds.rotation.y += 0.0005;
+atmosphere.rotation.y += 0.0002;
+stars.rotation.y -= 0.0001;
 
 renderer.render(scene, camera);
 }
@@ -977,16 +1020,16 @@ clouds.rotation.x += deltaY * 0.01;
 previousMousePosition = { x: e.clientX, y: e.clientY };
 });
 
-// Zoom functionality
+// Enhanced zoom functionality contained to globe
 globeContainer.addEventListener('wheel', (e) => {
 e.preventDefault();
 
 if (e.deltaY < 0) {
 // Zoom in
-camera.position.z = Math.max(150, camera.position.z - 15);
+camera.position.z = Math.max(120, camera.position.z - 12);
 } else {
 // Zoom out
-camera.position.z = Math.min(600, camera.position.z + 15);
+camera.position.z = Math.min(800, camera.position.z + 12);
 }
 });
 
@@ -1008,11 +1051,11 @@ analyzeName();
 
 // Globe controls
 zoomInBtn.addEventListener('click', () => {
-camera.position.z = Math.max(150, camera.position.z - 20);
+camera.position.z = Math.max(120, camera.position.z - 25);
 });
 
 zoomOutBtn.addEventListener('click', () => {
-camera.position.z = Math.min(600, camera.position.z + 20);
+camera.position.z = Math.min(800, camera.position.z + 25);
 });
 
 resetViewBtn.addEventListener('click', () => {
@@ -1026,6 +1069,9 @@ clouds.rotation.y = 0;
 clearMarkers();
 });
 
+// AI Globe Generator
+generateAIGlobeBtn.addEventListener('click', generateAIGlobe);
+
 // Suggestion tags
 document.querySelectorAll('.suggestion-tag').forEach(tag => {
 tag.addEventListener('click', () => {
@@ -1034,6 +1080,65 @@ nameInput.value = name;
 analyzeName();
 });
 });
+}
+
+// Generate AI Globe
+function generateAIGlobe() {
+// Show loading state
+generateAIGlobeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+generateAIGlobeBtn.disabled = true;
+
+// Simulate AI generation with enhanced visuals
+setTimeout(() => {
+// Generate random colors for the globe
+const colors = [0x1a2a6c, 0x2c3e50, 0x34495e, 0x2c3e50, 0x16a085, 0x27ae60, 0x2980b9, 0x8e44ad];
+const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+// Update globe material with new color
+globe.material.color.setHex(randomColor);
+
+// Add some random points for visual interest
+addRandomPoints();
+
+// Reset button
+generateAIGlobeBtn.innerHTML = '<i class="fas fa-robot"></i> AI Generate Globe';
+generateAIGlobeBtn.disabled = false;
+
+alert('AI Globe generated successfully! The globe has been enhanced with new visual features.');
+}, 2000);
+}
+
+// Add random points for AI globe enhancement
+function addRandomPoints() {
+clearMarkers();
+
+for (let i = 0; i < 50; i++) {
+const lat = (Math.random() - 0.5) * 180;
+const lng = (Math.random() - 0.5) * 360;
+const intensity = Math.random() * 0.8 + 0.2;
+
+// Convert lat/lon to 3D position
+const phi = (90 - lat) * (Math.PI / 180);
+const theta = (lng + 180) * (Math.PI / 180);
+
+const radius = 102;
+const x = -(radius * Math.sin(phi) * Math.cos(theta));
+const y = radius * Math.cos(phi);
+const z = radius * Math.sin(phi) * Math.sin(theta);
+
+// Create marker
+const markerGeometry = new THREE.SphereGeometry(0.8 + intensity * 2, 8, 8);
+const markerMaterial = new THREE.MeshBasicMaterial({
+color: 0xff6b6b,
+transparent: true,
+opacity: 0.7
+});
+const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+marker.position.set(x, y, z);
+
+scene.add(marker);
+nameMarkers.push(marker);
+}
 }
 
 // Analyze name function
@@ -1092,9 +1197,10 @@ let html = `
 <p><strong>Meaning:</strong> ${data.meaning}</p>
 <div class="pronunciation">
 <strong>Pronunciation:</strong> ${data.pronunciation}
-<button class="audio-btn" onclick="playPronunciation('${name}')">
+<button class="audio-btn" onclick="playPronunciation('${name}')" id="audioBtn-${name}">
 <i class="fas fa-volume-up"></i>
 </button>
+<span class="audio-loading" id="loading-${name}">Loading audio...</span>
 </div>
 </div>
 <div class="analysis-section">
@@ -1125,15 +1231,19 @@ ${countries.map(country =>
 </div>
 </div>
 
-<div class="analysis-section">
-<h4>Popularity Trend</h4>
-<p>${data.popularityTrend}</p>
-</div>
-
 <div class="external-links">
-<a href="https://www.names.org/n/${name}/about" target="_blank" class="external-link">More on Names.org</a>
-<a href="https://en.wikipedia.org/wiki/${nameCapitalized}_(name)" target="_blank" class="external-link">Wikipedia</a>
-<a href="https://forvo.com/word/${name}/" target="_blank" class="external-link">Hear Pronunciation</a>
+<a href="https://www.nameshouts.com/search/${name}" target="_blank" class="external-link">
+<i class="fas fa-external-link-alt"></i> NameShouts
+</a>
+<a href="https://forvo.com/word/${name}/" target="_blank" class="external-link">
+<i class="fas fa-external-link-alt"></i> Forvo
+</a>
+<a href="https://www.names.org/n/${name}/about" target="_blank" class="external-link">
+<i class="fas fa-external-link-alt"></i> Names.org
+</a>
+<a href="https://en.wikipedia.org/wiki/${nameCapitalized}_(name)" target="_blank" class="external-link">
+<i class="fas fa-external-link-alt"></i> Wikipedia
+</a>
 </div>
 `;
 
@@ -1242,6 +1352,13 @@ function playPronunciation(name) {
 const nameData = nameDatabase[name];
 if (!nameData) return;
 
+const audioBtn = document.getElementById(`audioBtn-${name}`);
+const loadingEl = document.getElementById(`loading-${name}`);
+
+// Show loading state
+audioBtn.classList.add('playing');
+loadingEl.style.display = 'inline';
+
 // Use Web Speech API
 if ('speechSynthesis' in window) {
 const utterance = new SpeechSynthesisUtterance(name);
@@ -1262,9 +1379,23 @@ utterance.lang = 'en-US';
 utterance.rate = 0.8;
 utterance.pitch = 1;
 
+utterance.onend = function() {
+audioBtn.classList.remove('playing');
+loadingEl.style.display = 'none';
+};
+
+utterance.onerror = function() {
+audioBtn.classList.remove('playing');
+loadingEl.style.display = 'none';
+alert(`Could not play pronunciation. Please use the external links for audio pronunciation.`);
+};
+
 speechSynthesis.speak(utterance);
 } else {
-alert(`Pronunciation: ${nameData.pronunciation}`);
+// Fallback if Web Speech API is not available
+audioBtn.classList.remove('playing');
+loadingEl.style.display = 'none';
+alert(`Pronunciation: ${nameData.pronunciation}. Your browser doesn't support audio playback. Please use the external links for audio pronunciation.`);
 }
 }
 
@@ -1272,6 +1403,9 @@ alert(`Pronunciation: ${nameData.pronunciation}`);
 window.addEventListener('beforeunload', () => {
 if (animationId) {
 cancelAnimationFrame(animationId);
+}
+if ('speechSynthesis' in window) {
+speechSynthesis.cancel();
 }
 });
 
