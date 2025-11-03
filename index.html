@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,6 +72,25 @@ margin-bottom: 20px;
 text-align: center;
 font-size: 1.1rem;
 border: 1px solid rgba(255, 255, 255, 0.1);
+display: flex;
+justify-content: space-between;
+align-items: center;
+flex-wrap: wrap;
+}
+
+.refresh-info {
+font-size: 0.9rem;
+display: flex;
+align-items: center;
+gap: 8px;
+background: rgba(0, 0, 0, 0.2);
+padding: 5px 10px;
+border-radius: 10px;
+}
+
+.refresh-countdown {
+font-weight: bold;
+color: #ffd700;
 }
 
 .main-content {
@@ -643,6 +661,11 @@ font-size: 2rem;
 .logo {
 font-size: 2.2rem;
 }
+
+.search-header {
+flex-direction: column;
+gap: 10px;
+}
 }
 
 @media (max-width: 480px) {
@@ -673,7 +696,12 @@ padding: 25px;
 </header>
 
 <div class="search-header">
+<div>
 <i class="fas fa-search"></i> Explore names pronunciation and cultural origins...
+</div>
+<div class="refresh-info">
+<i class="fas fa-sync-alt"></i> Auto-refresh in <span class="refresh-countdown" id="refreshCountdown">60</span>s
+</div>
 </div>
 
 <div class="main-content">
@@ -1213,15 +1241,25 @@ const zoomOutBtn = document.getElementById('zoomOut');
 const resetViewBtn = document.getElementById('resetView');
 const warningModal = document.getElementById('warningModal');
 const warningCloseBtn = document.getElementById('warningCloseBtn');
+const refreshCountdown = document.getElementById('refreshCountdown');
 
 // Three.js variables
 let scene, camera, renderer, earthMesh, cloudMesh, controls;
 let earthRadius = 200;
 
+// Auto-refresh variables
+let refreshTimer;
+let countdownInterval;
+let timeLeft = 60;
+
+// Debounce timer
+let debounceTimer;
+
 // Initialize the application
 function init() {
 initEarth3D();
 setupEventListeners();
+startAutoRefresh();
 }
 
 // Initialize 3D Earth with Three.js
@@ -1354,7 +1392,7 @@ function onWindowResize() {
 const canvas = document.getElementById('earthCanvas');
 camera.aspect = canvas.offsetWidth / canvas.offsetHeight;
 camera.updateProjectionMatrix();
-renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
+renderer.setSize(ccanvas.offsetWidth, canvas.offsetHeight);
 }
 
 // Setup event listeners
@@ -1373,6 +1411,27 @@ lastNameInput.addEventListener('keypress', (e) => {
 if (e.key === 'Enter') {
 analyzeName();
 }
+});
+
+// Auto-search on typing with debounce
+firstNameInput.addEventListener('input', () => {
+clearTimeout(debounceTimer);
+debounceTimer = setTimeout(() => {
+if (firstNameInput.value.trim() && !lastNameInput.value.trim()) {
+analyzeName();
+resetAutoRefresh();
+}
+}, 800);
+});
+
+lastNameInput.addEventListener('input', () => {
+clearTimeout(debounceTimer);
+debounceTimer = setTimeout(() => {
+if (lastNameInput.value.trim() && !firstNameInput.value.trim()) {
+analyzeName();
+resetAutoRefresh();
+}
+}, 800);
 });
 
 // Globe controls
@@ -1417,8 +1476,52 @@ firstNameInput.value = '';
 }
 
 analyzeName();
+resetAutoRefresh();
 });
 });
+}
+
+// Start auto-refresh functionality
+function startAutoRefresh() {
+resetAutoRefresh();
+}
+
+// Reset auto-refresh timer
+function resetAutoRefresh() {
+// Clear existing timers
+clearTimeout(refreshTimer);
+clearInterval(countdownInterval);
+
+// Reset countdown
+timeLeft = 60;
+refreshCountdown.textContent = timeLeft;
+
+// Start new countdown
+countdownInterval = setInterval(() => {
+timeLeft--;
+refreshCountdown.textContent = timeLeft;
+
+if (timeLeft <= 0) {
+clearInterval(countdownInterval);
+}
+}, 1000);
+
+// Set refresh timer
+refreshTimer = setTimeout(() => {
+// Clear inputs and results
+firstNameInput.value = '';
+lastNameInput.value = '';
+analysisResult.style.display = 'none';
+
+// Reset globe view
+if (controls) controls.reset();
+
+// Show notification
+showResult('Page has been refreshed. Enter a new name to search.', false);
+
+// Restart auto-refresh
+resetAutoRefresh();
+}, 60000); // 1 minute
 }
 
 // Analyze name function with validation
@@ -1462,15 +1565,6 @@ showResult(`We don't have detailed analysis for "<span class="name-highlight">${
 // Hide loading state
 analyzeBtn.classList.remove('loading');
 loadingSpinner.style.display = 'none';
-
-// Auto-refresh after search
-setTimeout(() => {
-firstNameInput.value = '';
-lastNameInput.value = '';
-analysisResult.style.display = 'none';
-if (controls) controls.reset(); // Reset globe view
-}, 5000);
-
 }, 1000);
 }
 
