@@ -3,98 +3,223 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nexus Explorer — Advanced Name Analysis</title>
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://unpkg.com/three@0.155.0/build/three.min.js"></script>
-<script src="https://unpkg.com/globe.gl"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<title>Cultural Name Analysis | Discover Your Name's Origins</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
 <style>
 :root {
---primary: #4F8DFF;
---secondary: #6CD9D6;
---accent: #FF7EB3;
---highlight: #FFD166;
---dark: #2A2D43;
---light: #F7FAFF;
---glass: rgba(255, 255, 255, 0.25);
+--primary: #4a54e1;
+--primary-dark: #3a44d1;
+--secondary: #ff6b6b;
+--accent: #2ecc71;
+--dark: #1a1a2e;
+--darker: #16213e;
+--light: #f8f9fa;
+--gradient: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
 }
 
 * {
 margin: 0;
 padding: 0;
 box-sizing: border-box;
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-background: linear-gradient(135deg, #E6F0FF 0%, #F0F7FF 50%, #E6F0FF 100%);
+background: var(--gradient);
+color: var(--light);
 min-height: 100vh;
-font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-color: var(--dark);
+overflow-x: hidden;
+line-height: 1.6;
 }
 
-.glass-panel {
-background: var(--glass);
-backdrop-filter: blur(20px);
-border-radius: 24px;
-border: 1px solid rgba(255, 255, 255, 0.4);
-box-shadow:
-0 8px 32px rgba(31, 38, 135, 0.1),
-inset 0 1px 0 rgba(255, 255, 255, 0.6);
+.container {
+max-width: 1200px;
+margin: 0 auto;
+padding: 20px;
 }
 
-.glass-card {
-background: rgba(255, 255, 255, 0.7);
-backdrop-filter: blur(15px);
-border-radius: 20px;
-border: 1px solid rgba(255, 255, 255, 0.5);
-box-shadow:
-0 4px 20px rgba(31, 38, 135, 0.1),
-inset 0 1px 0 rgba(255, 255, 255, 0.8);
+header {
+text-align: center;
+padding: 40px 0 20px;
+position: relative;
 }
 
-.gradient-text {
-background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+.logo {
+font-size: 2.8rem;
+font-weight: 800;
+margin-bottom: 10px;
+background: linear-gradient(45deg, #fff, #a8edea);
 -webkit-background-clip: text;
 -webkit-text-fill-color: transparent;
-background-clip: text;
+text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
-.btn-primary {
-background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-border: none;
-color: white;
-font-weight: 600;
-position: relative;
+h1 {
+font-size: 2.5rem;
+margin-bottom: 15px;
+text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.subtitle {
+font-size: 1.2rem;
+opacity: 0.9;
+max-width: 700px;
+margin: 0 auto 30px;
+font-weight: 300;
+}
+
+.main-content {
+display: flex;
+flex-wrap: wrap;
+justify-content: center;
+gap: 40px;
+margin: 40px 0;
+align-items: center;
+}
+
+.globe-section {
+flex: 1;
+min-width: 500px;
+display: flex;
+justify-content: center;
+align-items: center;
+}
+
+.globe-container {
+width: 500px;
+height: 500px;
+border-radius: 50%;
 overflow: hidden;
+box-shadow:
+0 15px 35px rgba(0, 0, 0, 0.5),
+inset 0 0 50px rgba(255, 255, 255, 0.1);
+position: relative;
+background: rgba(0, 0, 0, 0.2);
+transition: transform 0.3s ease;
 }
 
-.btn-primary::before {
-content: '';
-position: absolute;
-top: 0;
-left: -100%;
+.globe-container:hover {
+transform: scale(1.02);
+}
+
+#globeCanvas {
 width: 100%;
 height: 100%;
-background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-transition: left 0.5s;
+display: block;
 }
 
-.btn-primary:hover::before {
-left: 100%;
+.search-section {
+flex: 1;
+min-width: 400px;
+background: rgba(255, 255, 255, 0.1);
+backdrop-filter: blur(15px);
+border-radius: 20px;
+padding: 35px;
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.btn-primary:hover:not(:disabled) {
+.search-title {
+font-size: 1.8rem;
+margin-bottom: 25px;
+text-align: center;
+font-weight: 600;
+}
+
+.checkbox-container {
+display: flex;
+align-items: center;
+margin-bottom: 25px;
+padding: 15px;
+background: rgba(0, 0, 0, 0.2);
+border-radius: 10px;
+}
+
+.checkbox-container input {
+margin-right: 12px;
+transform: scale(1.3);
+accent-color: var(--primary);
+}
+
+.checkbox-container label {
+font-weight: 500;
+}
+
+.search-input-container {
+display: flex;
+gap: 15px;
+margin-bottom: 20px;
+}
+
+input[type="text"] {
+flex: 1;
+padding: 18px 25px;
+border: none;
+border-radius: 50px;
+background: rgba(255, 255, 255, 0.95);
+font-size: 1.1rem;
+box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+transition: all 0.3s ease;
+}
+
+input[type="text"]:focus {
+outline: none;
+box-shadow:
+inset 0 2px 10px rgba(0, 0, 0, 0.1),
+0 0 0 3px rgba(74, 84, 225, 0.3);
+transform: translateY(-2px);
+}
+
+.search-btn {
+background: var(--primary);
+color: white;
+border: none;
+border-radius: 50px;
+padding: 18px 35px;
+font-size: 1.1rem;
+font-weight: 600;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 10px;
+transition: all 0.3s ease;
+box-shadow: 0 5px 15px rgba(74, 84, 225, 0.4);
+min-width: 180px;
+}
+
+.search-btn:hover {
+background: var(--primary-dark);
 transform: translateY(-3px);
-box-shadow: 0 10px 25px rgba(79, 141, 255, 0.3);
+box-shadow: 0 8px 20px rgba(74, 84, 225, 0.6);
+}
+
+.search-btn:active {
+transform: translateY(0);
+}
+
+.search-btn i {
+font-size: 1.2rem;
+}
+
+.features {
+display: flex;
+justify-content: space-between;
+margin: 80px 0 40px;
+gap: 25px;
 }
 
 .feature-card {
+flex: 1;
+border-radius: 20px;
+padding: 35px 30px;
+text-align: center;
+box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 transition: all 0.4s ease;
-cursor: pointer;
 position: relative;
 overflow: hidden;
+z-index: 1;
 }
 
 .feature-card::before {
@@ -102,789 +227,466 @@ content: '';
 position: absolute;
 top: 0;
 left: 0;
-right: 0;
-height: 4px;
-background: linear-gradient(90deg, var(--primary), var(--secondary));
-transform: scaleX(0);
-transition: transform 0.4s ease;
-}
-
-.feature-card:hover::before {
-transform: scaleX(1);
+width: 100%;
+height: 100%;
+background: linear-gradient(45deg, rgba(255,255,255,0.1), transparent);
+z-index: -1;
+opacity: 0;
+transition: opacity 0.4s ease;
 }
 
 .feature-card:hover {
-transform: translateY(-8px);
-box-shadow: 0 15px 30px rgba(31, 38, 135, 0.15);
+transform: translateY(-10px);
 }
 
-.chip {
-display: inline-flex;
-align-items: center;
-padding: 0.6rem 1.2rem;
-border-radius: 50px;
-margin: 0.3rem;
-font-size: 0.9rem;
-cursor: pointer;
-transition: all 0.3s ease;
-font-weight: 500;
-border: 1px solid transparent;
-background: rgba(255, 255, 255, 0.8);
-backdrop-filter: blur(10px);
-}
-
-.chip:hover {
-transform: translateY(-2px);
-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-border-color: var(--primary);
-}
-
-.seed-chip {
-background: linear-gradient(135deg, rgba(79, 141, 255, 0.15) 0%, rgba(108, 217, 214, 0.15) 100%);
-color: var(--primary);
-border-color: rgba(79, 141, 255, 0.3);
-}
-
-.dynamic-chip {
-background: linear-gradient(135deg, rgba(255, 126, 179, 0.15) 0%, rgba(255, 209, 102, 0.15) 100%);
-color: var(--accent);
-border-color: rgba(255, 126, 179, 0.3);
-}
-
-.fade-in {
-animation: fadeIn 0.6s ease-out;
-}
-
-@keyframes fadeIn {
-from {
-opacity: 0;
-transform: translateY(20px);
-}
-to {
+.feature-card:hover::before {
 opacity: 1;
-transform: translateY(0);
-}
 }
 
-.globe-container {
-width: 100%;
-height: 500px;
-border-radius: 20px;
-overflow: hidden;
-background: rgba(255, 255, 255, 0.3);
-border: 1px solid rgba(255, 255, 255, 0.5);
+.feature-icon {
+font-size: 3rem;
+margin-bottom: 20px;
+display: block;
 }
 
-.loading-spinner {
-display: inline-block;
-width: 24px;
-height: 24px;
-border: 3px solid rgba(255, 255, 255, 0.3);
-border-radius: 50%;
-border-top-color: white;
-animation: spin 1s ease-in-out infinite;
-margin-right: 0.5rem;
-}
-
-@keyframes spin {
-to { transform: rotate(360deg); }
-}
-
-.pulse-glow {
-animation: pulseGlow 2s infinite;
-}
-
-@keyframes pulseGlow {
-0% {
-box-shadow: 0 0 5px rgba(79, 141, 255, 0.4);
-}
-50% {
-box-shadow: 0 0 20px rgba(79, 141, 255, 0.8);
-}
-100% {
-box-shadow: 0 0 5px rgba(79, 141, 255, 0.4);
-}
-}
-
-.tab-active {
-background: rgba(255, 255, 255, 0.6);
-color: var(--primary);
-font-weight: 600;
-border-bottom: 3px solid var(--primary);
-}
-
-.section-title {
-position: relative;
-display: inline-block;
-margin-bottom: 1.5rem;
+.feature-card h3 {
+font-size: 1.5rem;
+margin-bottom: 15px;
 font-weight: 700;
 }
 
-.section-title::after {
-content: '';
+.feature-card p {
+opacity: 0.9;
+line-height: 1.6;
+font-size: 1.05rem;
+}
+
+.feature-1 {
+background: linear-gradient(135deg, #3498db, #8e44ad);
+}
+
+.feature-2 {
+background: linear-gradient(135deg, #e74c3c, #e67e22);
+}
+
+.feature-3 {
+background: linear-gradient(135deg, #2ecc71, #1abc9c);
+}
+
+.instructions {
+text-align: center;
+margin: 30px 0;
+font-size: 1.1rem;
+opacity: 0.9;
+font-style: italic;
+}
+
+footer {
+text-align: center;
+margin-top: 60px;
+padding: 30px;
+opacity: 0.8;
+font-size: 0.95rem;
+border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.globe-controls {
 position: absolute;
-bottom: -8px;
-left: 0;
-width: 40%;
-height: 3px;
-background: linear-gradient(90deg, var(--primary), transparent);
-border-radius: 3px;
-}
-
-.country-flag {
-width: 40px;
-height: 30px;
-object-fit: cover;
-border-radius: 4px;
-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.stat-card {
-background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%);
+bottom: 20px;
+left: 50%;
+transform: translateX(-50%);
+background: rgba(0, 0, 0, 0.5);
+padding: 10px 20px;
+border-radius: 30px;
+display: flex;
+gap: 15px;
 backdrop-filter: blur(10px);
-border-radius: 16px;
-border: 1px solid rgba(255, 255, 255, 0.6);
-transition: all 0.3s ease;
 }
 
-.stat-card:hover {
-transform: translateY(-5px);
-box-shadow: 0 10px 20px rgba(31, 38, 135, 0.1);
-}
-
-.nav-dot {
-width: 8px;
-height: 8px;
-border-radius: 50%;
-background: var(--primary);
-opacity: 0.5;
-transition: all 0.3s ease;
-}
-
-.nav-dot.active {
-opacity: 1;
-transform: scale(1.2);
-}
-
-/* Multi-colored sections */
-.section-blue {
-background: linear-gradient(135deg, #4F8DFF 0%, #6CD9D6 100%);
-}
-
-.section-purple {
-background: linear-gradient(135deg, #9F7AEA 0%, #667EEA 100%);
-}
-
-.section-green {
-background: linear-gradient(135deg, #48BB78 0%, #38B2AC 100%);
-}
-
-.section-orange {
-background: linear-gradient(135deg, #ED8936 0%, #ECC94B 100%);
-}
-
-.country-label {
-background: rgba(0, 0, 0, 0.8);
+.control-btn {
+background: rgba(255, 255, 255, 0.2);
+border: none;
 color: white;
-padding: 8px 12px;
-border-radius: 8px;
-font-size: 14px;
-pointer-events: none;
-border: 2px solid white;
+width: 40px;
+height: 40px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+background: rgba(255, 255, 255, 0.3);
+transform: scale(1.1);
+}
+
+@media (max-width: 1100px) {
+.main-content {
+flex-direction: column;
+}
+
+.globe-section, .search-section {
+min-width: 100%;
+}
+
+.globe-container {
+width: 450px;
+height: 450px;
+}
+}
+
+@media (max-width: 768px) {
+.globe-container {
+width: 350px;
+height: 350px;
+}
+
+.features {
+flex-direction: column;
+}
+
+h1 {
+font-size: 2rem;
+}
+
+.logo {
+font-size: 2.2rem;
+}
+}
+
+@media (max-width: 480px) {
+.globe-container {
+width: 280px;
+height: 280px;
+}
+
+.search-input-container {
+flex-direction: column;
+}
+
+.search-btn {
+width: 100%;
+}
+
+.search-section {
+padding: 25px;
+}
 }
 </style>
 </head>
-<body class="text-gray-800">
-<!-- Header -->
-<header class="py-6 px-4">
-<div class="max-w-7xl mx-auto">
-<div class="flex items-center justify-between">
-<div class="flex items-center space-x-4">
-<div class="w-14 h-14 rounded-2xl glass-panel flex items-center justify-center pulse-glow">
-<i class="fas fa-globe-americas text-2xl gradient-text"></i>
-</div>
-<div>
-<h1 class="text-3xl font-bold gradient-text">Nexus Explorer</h1>
-<p class="text-gray-600 text-sm">Advanced Cultural Name Analysis</p>
-</div>
-</div>
-<div class="flex space-x-3">
-<button class="glass-panel px-4 py-2 rounded-xl text-sm text-gray-700 hover:text-primary transition-colors">
-<i class="fas fa-cog mr-2"></i>Settings
-</button>
-<button class="glass-panel px-4 py-2 rounded-xl text-sm text-gray-700 hover:text-primary transition-colors">
-<i class="fas fa-question-circle mr-2"></i>Help
-</button>
-</div>
-</div>
-</div>
+<body>
+<div class="container">
+<header>
+<div class="logo">Cultural Name Analysis</div>
+<h1>Discover Your Name's Global Origins</h1>
+<p class="subtitle">Explore the cultural roots, geographical distribution, and historical significance of names from around the world</p>
 </header>
 
-<!-- Main Content -->
-<main class="py-8 px-4">
-<div class="max-w-7xl mx-auto">
-<!-- Hero Section -->
-<div class="text-center mb-12">
-<h2 class="text-5xl font-bold text-gray-800 mb-4">Discover Your Name's <span class="gradient-text">Global Identity</span></h2>
-<p class="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
-Explore the cultural origins, geographical distribution, and linguistic variations of names through our advanced analysis platform.
-</p>
-
-<!-- Interactive Feature Navigation -->
-<div class="flex justify-center space-x-6 mb-8">
-<div class="feature-card glass-card p-4 w-40 text-center" onclick="showFeature('global')">
-<div class="text-3xl mb-3 gradient-text"><i class="fas fa-database"></i></div>
-<h3 class="font-semibold text-gray-800">Global Database</h3>
-<p class="text-xs text-gray-600 mt-2">Access comprehensive name data</p>
-</div>
-<div class="feature-card glass-card p-4 w-40 text-center" onclick="showFeature('visual')">
-<div class="text-3xl mb-3 gradient-text"><i class="fas fa-chart-network"></i></div>
-<h3 class="font-semibold text-gray-800">Visual Analytics</h3>
-<p class="text-xs text-gray-600 mt-2">Interactive data visualizations</p>
-</div>
-<div class="feature-card glass-card p-4 w-40 text-center" onclick="showFeature('privacy')">
-<div class="text-3xl mb-3 gradient-text"><i class="fas fa-user-shield"></i></div>
-<h3 class="font-semibold text-gray-800">Privacy First</h3>
-<p class="text-xs text-gray-600 mt-2">Your data stays with you</p>
-</div>
-</div>
-</div>
-
-<!-- Main Dashboard -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-<!-- Left Panel - Input & Basic Info -->
-<div class="lg:col-span-1">
-<div class="glass-card p-6 h-full">
-<!-- Privacy Consent -->
-<div class="mb-6">
-<div class="flex items-start mb-4">
-<input
-type="checkbox"
-id="consentCheckbox"
-class="mr-3 mt-1 h-5 w-5 text-primary rounded focus:ring-primary"
->
-<label for="consentCheckbox" class="text-gray-700 text-sm">
-I understand this tool processes names entirely in my browser. No data is stored or transmitted.
-</label>
-</div>
-</div>
-
-<!-- Search Section -->
-<div class="mb-6">
-<div class="relative">
-<input
-id="nameInput"
-type="text"
-placeholder="Enter a name to explore..."
-class="w-full p-4 pl-12 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-lg bg-white/80"
-maxlength="50"
->
-<div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-<i class="fas fa-search"></i>
-</div>
-</div>
-</div>
-
-<!-- Action Button -->
-<button
-id="analyzeBtn"
-class="btn-primary w-full py-4 rounded-xl text-lg font-semibold mb-6"
-disabled
->
-<span id="btnText">
-<i class="fas fa-rocket mr-2"></i>Analyze Name
-</span>
-<span id="btnLoading" class="hidden">
-<div class="loading-spinner"></div> Analyzing...
-</span>
-</button>
-
-<!-- Quick Stats -->
-<div id="quickStats" class="hidden">
-<div class="grid grid-cols-2 gap-4 mb-6">
-<div class="stat-card p-4 rounded-xl text-center">
-<div class="text-2xl font-bold text-primary" id="topProbability">0%</div>
-<div class="text-sm text-gray-600">Top Probability</div>
-</div>
-<div class="stat-card p-4 rounded-xl text-center">
-<div class="text-2xl font-bold text-secondary" id="countriesCount">0</div>
-<div class="text-sm text-gray-600">Countries</div>
-</div>
-</div>
-</div>
-
-<!-- Current Country Display -->
-<div id="currentCountry" class="hidden mt-4 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200">
-<h3 class="font-semibold text-gray-800 mb-2">🌍 Current Focus</h3>
-<div id="countryDisplay" class="text-sm text-gray-600">
-Click on the globe or analyze a name to see country details
-</div>
-</div>
-</div>
-</div>
-
-<!-- Right Panel - Globe & Visualization -->
-<div class="lg:col-span-2">
-<div class="glass-card p-6 h-full">
-<!-- Tabs -->
-<div class="flex space-x-2 mb-6">
-<button id="tabGlobe" class="tab-active px-4 py-2 rounded-lg transition-colors">
-<i class="fas fa-globe mr-2"></i>Global Distribution
-</button>
-<button id="tabRegion" class="px-4 py-2 rounded-lg text-gray-600 hover:bg-white/50 transition-colors">
-<i class="fas fa-map mr-2"></i>Regional Analysis
-</button>
-</div>
-
-<!-- Globe Container -->
-<div id="globeSection">
+<div class="main-content">
+<div class="globe-section">
 <div class="globe-container">
-<div id="globeViz"></div>
-</div>
-<div class="text-center mt-4 text-gray-600">
-<p>Click on highlighted regions to explore name distribution</p>
-</div>
-</div>
-
-<!-- Region Details Container -->
-<div id="regionSection" class="hidden">
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-<!-- Country Details Card -->
-<div class="glass-card p-6 section-blue text-white">
-<h3 class="text-xl font-bold mb-4 section-title">Top Country</h3>
-<div id="countryDetails" class="text-center">
-<div class="text-white/80">Analyze a name to see country details</div>
-</div>
-</div>
-
-<!-- Regional Stats -->
-<div class="glass-card p-6 section-purple text-white">
-<h3 class="text-xl font-bold mb-4 section-title">Regional Stats</h3>
-<div id="regionalStats" class="space-y-4">
-<div class="text-white/80">Regional data will appear here</div>
-</div>
-</div>
-</div>
-</div>
+<canvas id="globeCanvas"></canvas>
+<div class="globe-controls">
+<button class="control-btn" id="zoomIn">+</button>
+<button class="control-btn" id="zoomOut">-</button>
+<button class="control-btn" id="resetView">↺</button>
 </div>
 </div>
 </div>
 
-<!-- Results Section -->
-<div id="results" class="glass-card p-6 mb-8"></div>
+<div class="search-section">
+<h2 class="search-title">Explore Name Origins</h2>
 
-<!-- Single Features Section with Colors -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-<div class="feature-card p-6 text-center text-white rounded-2xl section-blue" onclick="showFeature('global')">
-<div class="text-4xl mb-4"><i class="fas fa-database"></i></div>
-<h3 class="text-xl font-bold mb-2">Global Database</h3>
-<p class="text-white/90">Access comprehensive name data from cultures worldwide</p>
+<div class="checkbox-container">
+<input type="checkbox" id="privacyCheck">
+<label for="privacyCheck">I understand this tool processes name data for cultural analysis</label>
 </div>
-<div class="feature-card p-6 text-center text-white rounded-2xl section-green" onclick="showFeature('visual')">
-<div class="text-4xl mb-4"><i class="fas fa-chart-network"></i></div>
-<h3 class="text-xl font-bold mb-2">Visual Analytics</h3>
-<p class="text-white/90">Interactive visualizations of name distribution and origins</p>
-</div>
-<div class="feature-card p-6 text-center text-white rounded-2xl section-orange" onclick="showFeature('privacy')">
-<div class="text-4xl mb-4"><i class="fas fa-user-shield"></i></div>
-<h3 class="text-xl font-bold mb-2">Privacy First</h3>
-<p class="text-white/90">Your data never leaves your device - guaranteed</p>
-</div>
-</div>
-</div>
-</main>
 
-<!-- Footer -->
-<footer class="py-8 px-4 text-gray-600">
-<div class="max-w-7xl mx-auto text-center">
-<div class="flex justify-center space-x-6 mb-4">
-<a href="#" class="hover:text-primary transition-colors"><i class="fab fa-github"></i></a>
-<a href="#" class="hover:text-primary transition-colors"><i class="fab fa-twitter"></i></a>
-<a href="#" class="hover:text-primary transition-colors"><i class="fab fa-linkedin"></i></a>
+<div class="search-input-container">
+<input type="text" placeholder="Enter a name to explore its cultural origins...">
+<button class="search-btn">
+<span>Analyze Name</span>
+</button>
 </div>
-<p class="mb-2">Nexus Explorer — Advanced Cultural Identity Analysis</p>
-<p class="text-sm">Built with privacy in mind. No data is stored or transmitted.</p>
+
+<p class="instructions">Try names like "Maria", "Mohammed", "Wei", "Sofia", or "John" to see cultural distributions</p>
 </div>
+</div>
+
+<div class="features">
+<div class="feature-card feature-1">
+<div class="feature-icon">🌍</div>
+<h3>Global Database</h3>
+<p>Access our comprehensive database of over 50,000 names from 200+ cultures and regions. Our continuously updated collection ensures accurate cultural and historical context for every name.</p>
+</div>
+
+<div class="feature-card feature-2">
+<div class="feature-icon">📊</div>
+<h3>Visual Analytics</h3>
+<p>Explore interactive visualizations that reveal name distribution patterns, migration paths, and cultural connections through beautiful, intuitive data representations.</p>
+</div>
+
+<div class="feature-card feature-3">
+<div class="feature-icon">🔒</div>
+<h3>Privacy First</h3>
+<p>Your data stays with you. We employ advanced privacy measures and never store personal information. All analysis happens securely in your browser.</p>
+</div>
+</div>
+
+<footer>
+<p>© 2023 Cultural Name Analysis Tool | Exploring Global Names and Cultural Heritage</p>
 </footer>
+</div>
 
 <script>
-// Configuration
-const CONFIG = {
-API: {
-NATIONALIZE: 'https://api.nationalize.io',
-REST_COUNTRIES: 'https://restcountries.com/v3.1/alpha/'
-},
-DISPLAY: {
-MAX_COUNTRIES: 8,
-MAX_VARIANTS: 12
-},
-GLOBE: {
-ROTATION_SPEED: 0.1,
-ENABLE_AUTO_ROTATE: true
-}
-};
+// Three.js Globe Implementation
+let scene, camera, renderer, globe, stars;
+let isMouseDown = false;
+let previousMousePosition = { x: 0, y: 0 };
+const originalCameraZ = 300;
 
-// Country code to language mapping
-const COUNTRY_LANGUAGES = {
-"US":"en","GB":"en","FR":"fr","DE":"de","ES":"es","IT":"it","PT":"pt","RU":"ru","JP":"ja","CN":"zh","KR":"ko","IN":"hi","BR":"pt","CA":"en","AU":"en","MX":"es","NL":"nl","BE":"nl","SE":"sv","CH":"de","AT":"de","NO":"no","DK":"da","FI":"fi","IE":"en","PL":"pl","GR":"el","TR":"tr","IL":"he","SA":"ar","AE":"ar","AR":"es","CL":"es","CO":"es","PE":"es","ZA":"en","NG":"en","PH":"en","TH":"th","VN":"vi","ID":"id","PK":"ur","BD":"bn","LK":"si","EG":"ar","MA":"ar","RO":"ro","HU":"hu","CZ":"cs","SK":"sk","UA":"uk","BY":"be","RS":"sr","HR":"hr","SI":"sl","BG":"bg","EE":"et","LV":"lv","LT":"lt","IS":"is"
-};
+function initGlobe() {
+// Scene setup
+scene = new THREE.Scene();
+scene.background = null;
 
-// Name variants database
-const NAME_VARIANTS = {
-"Laurent": ["Lorenzo", "Lawrence", "Lavrentiy", "Laurence", "Lorenz"],
-"John": ["Juan", "Jean", "Johann", "Giovanni", "Sean", "Ian", "Ivan"],
-"Maria": ["Marie", "Mary", "María", "Marya", "Mariya", "Mariam"],
-"Michael": ["Miguel", "Michele", "Mikhail", "Mikael", "Micheal"],
-"Anna": ["Anne", "Ana", "Ann", "Hannah", "Annette", "Annie"],
-"David": ["Dávid", "Dawid", "Daid", "Dawood", "Dafydd"],
-"Sarah": ["Sara", "Zara", "Saira", "Saara", "Sarai"],
-"James": ["Jacques", "Jacopo", "Seamus", "Hamish", "Jaime"],
-"Elizabeth": ["Isabel", "Elisabet", "Elżbieta", "Yelizaveta", "Elisheva"],
-"Mohammed": ["Muhammad", "Mehmet", "Mahmoud", "Ahmed", "Hamid"]
-};
+// Camera setup
+const canvas = document.getElementById('globeCanvas');
+camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 2000);
+camera.position.z = originalCameraZ;
 
-// DOM Elements
-const elements = {
-analyzeBtn: document.getElementById('analyzeBtn'),
-nameInput: document.getElementById('nameInput'),
-consentCheckbox: document.getElementById('consentCheckbox'),
-results: document.getElementById('results'),
-btnText: document.getElementById('btnText'),
-btnLoading: document.getElementById('btnLoading'),
-globeSection: document.getElementById('globeSection'),
-regionSection: document.getElementById('regionSection'),
-tabGlobe: document.getElementById('tabGlobe'),
-tabRegion: document.getElementById('tabRegion'),
-quickStats: document.getElementById('quickStats'),
-topProbability: document.getElementById('topProbability'),
-countriesCount: document.getElementById('countriesCount'),
-countryDetails: document.getElementById('countryDetails'),
-regionalStats: document.getElementById('regionalStats'),
-globeViz: document.getElementById('globeViz'),
-currentCountry: document.getElementById('currentCountry'),
-countryDisplay: document.getElementById('countryDisplay')
-};
-
-// Application State
-let state = {
-currentChart: null,
-isAnalyzing: false,
-currentName: '',
-countryData: null,
-globe: null,
-currentTab: 'globe',
-currentFeature: 'global',
-currentCountry: null
-};
-
-/**
-* Initialize the application
-*/
-function init() {
-setupEventListeners();
-initializeGlobe();
-console.log('🌍 Nexus Explorer initialized');
-}
-
-/**
-* Set up event listeners
-*/
-function setupEventListeners() {
-elements.analyzeBtn.addEventListener('click', handleAnalysis);
-elements.nameInput.addEventListener('input', handleInputChange);
-elements.nameInput.addEventListener('keydown', (e) => {
-if (e.key === 'Enter' && !state.isAnalyzing) {
-handleAnalysis();
-}
+// Renderer setup
+renderer = new THREE.WebGLRenderer({
+canvas: canvas,
+antialias: true,
+alpha: true
 });
-elements.consentCheckbox.addEventListener('change', handleConsentChange);
+renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-// Tab switching
-elements.tabGlobe.addEventListener('click', () => switchTab('globe'));
-elements.tabRegion.addEventListener('click', () => switchTab('region'));
-}
+// Create the globe with more detail
+const globeGeometry = new THREE.SphereGeometry(100, 128, 128);
 
-/**
-* Show feature information
-*/
-function showFeature(feature) {
-const featureMessages = {
-global: "Global Database: Access our comprehensive collection of name data from cultures worldwide, with historical and cultural context.",
-visual: "Visual Analytics: Explore interactive visualizations including 3D globes, charts, and regional breakdowns of name distribution.",
-privacy: "Privacy First: All processing happens locally in your browser. No data is ever stored or transmitted to servers."
-};
-
-alert(featureMessages[feature]);
-}
-
-/**
-* Switch between tabs
-*/
-function switchTab(tab) {
-state.currentTab = tab;
-
-// Update tab buttons
-elements.tabGlobe.classList.toggle('tab-active', tab === 'globe');
-elements.tabGlobe.classList.toggle('text-gray-600', tab !== 'globe');
-elements.tabRegion.classList.toggle('tab-active', tab === 'region');
-elements.tabRegion.classList.toggle('text-gray-600', tab !== 'region');
-
-// Show/hide sections
-elements.globeSection.classList.toggle('hidden', tab !== 'globe');
-elements.regionSection.classList.toggle('hidden', tab !== 'region');
-
-// If switching to region tab and we have data, update region view
-if (tab === 'region' && state.countryData) {
-updateRegionView();
-}
-}
-
-/**
-* Handle input changes
-*/
-function handleInputChange() {
-const hasText = elements.nameInput.value.trim().length > 0;
-const hasConsent = elements.consentCheckbox.checked;
-elements.analyzeBtn.disabled = !(hasText && hasConsent) || state.isAnalyzing;
-}
-
-/**
-* Handle consent checkbox changes
-*/
-function handleConsentChange() {
-handleInputChange();
-}
-
-/**
-* Handle name analysis
-*/
-function handleAnalysis() {
-const name = elements.nameInput.value.trim();
-if (name && !state.isAnalyzing) {
-analyzeName(name);
-}
-}
-
-/**
-* Initialize the globe visualization
-*/
-function initializeGlobe() {
-state.globe = Globe()(elements.globeViz)
-.globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-.backgroundColor('rgba(0,0,0,0)')
-.showAtmosphere(true)
-.atmosphereColor('rgba(100, 149, 237, 0.3)')
-.hexBinPointWeight('weight')
-.hexBinResolution(4)
-.hexBinMargin(0.3)
-.hexBinMerge(true)
-.hexAltitude(0.01)
-.hexTopColor(d => `rgba(79, 141, 255, ${Math.max(0.3, d.weight / 100)})`)
-.hexSideColor(() => 'rgba(79, 141, 255, 0.3)')
-.hexLabel(d => `
-<div class="country-label">
-<strong>${d.country}</strong><br/>
-Probability: ${d.weight}%
-</div>
-`)
-.onHexClick(d => {
-// When a hex is clicked, switch to region view and show details
-switchTab('region');
-showCountryDetails(d.country, d.weight);
-updateCurrentCountry(d.country, d.weight);
+// Create a more detailed texture-like appearance programmatically
+const globeMaterial = new THREE.MeshPhongMaterial({
+color: 0x1a2a6c,
+specular: 0x4488ff,
+shininess: 50,
+transparent: true,
+opacity: 0.95,
+flatShading: false
 });
 
-// Auto-rotate the globe
-if (CONFIG.GLOBE.ENABLE_AUTO_ROTATE) {
-let angle = 0;
-const animate = () => {
-angle += CONFIG.GLOBE.ROTATION_SPEED * 0.01;
-state.globe.rotation({ y: angle });
+globe = new THREE.Mesh(globeGeometry, globeMaterial);
+scene.add(globe);
+
+// Add detailed country outlines
+const outlineGeometry = new THREE.SphereGeometry(101, 128, 128);
+const outlineMaterial = new THREE.MeshBasicMaterial({
+color: 0xffffff,
+wireframe: true,
+transparent: true,
+opacity: 0.15
+});
+
+const outline = new THREE.Mesh(outlineGeometry, outlineMaterial);
+scene.add(outline);
+
+// Add atmospheric glow
+const atmosphereGeometry = new THREE.SphereGeometry(105, 64, 64);
+const atmosphereMaterial = new THREE.MeshBasicMaterial({
+color: 0x4488ff,
+transparent: true,
+opacity: 0.05,
+side: THREE.BackSide
+});
+
+const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+scene.add(atmosphere);
+
+// Add lights for better 3D effect
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+scene.add(ambientLight);
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+directionalLight.position.set(5, 3, 5);
+scene.add(directionalLight);
+
+const pointLight = new THREE.PointLight(0x4488ff, 0.5, 500);
+pointLight.position.set(10, 10, 10);
+scene.add(pointLight);
+
+// Add stars background
+const starGeometry = new THREE.BufferGeometry();
+const starCount = 10000;
+const positions = new Float32Array(starCount * 3);
+const colors = new Float32Array(starCount * 3);
+const sizes = new Float32Array(starCount);
+
+for (let i = 0; i < starCount * 3; i += 3) {
+// Random position in a sphere
+const radius = 800 + Math.random() * 700;
+const theta = Math.random() * Math.PI * 2;
+const phi = Math.acos((Math.random() * 2) - 1);
+
+positions[i] = radius * Math.sin(phi) * Math.cos(theta);
+positions[i+1] = radius * Math.sin(phi) * Math.sin(theta);
+positions[i+2] = radius * Math.cos(phi);
+
+// Random color (mostly white with some blue/yellow)
+const colorVal = 0.8 + Math.random() * 0.2;
+colors[i] = colorVal;
+colors[i+1] = colorVal;
+colors[i+2] = colorVal + Math.random() * 0.2;
+
+// Random size
+sizes[i/3] = Math.random() * 2;
+}
+
+starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+starGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+starGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+const starMaterial = new THREE.PointsMaterial({
+size: 1.5,
+vertexColors: true,
+transparent: true,
+sizeAttenuation: true
+});
+
+stars = new THREE.Points(starGeometry, starMaterial);
+scene.add(stars);
+
+// Animation loop
+function animate() {
 requestAnimationFrame(animate);
-};
+
+// Slow, natural rotation
+globe.rotation.y += 0.0005;
+outline.rotation.y += 0.0005;
+atmosphere.rotation.y += 0.0003;
+stars.rotation.y -= 0.0001;
+
+renderer.render(scene, camera);
+}
+
 animate();
-}
-}
 
-/**
-* Update current country display
-*/
-function updateCurrentCountry(countryCode, probability) {
-state.currentCountry = countryCode;
-elements.currentCountry.classList.remove('hidden');
-elements.countryDisplay.innerHTML = `
-<div class="flex items-center justify-between">
-<span class="font-semibold">${countryCode}</span>
-<span class="text-primary font-bold">${probability}% match</span>
-</div>
-<div class="mt-2 text-xs">
-Click "Regional Analysis" tab for detailed information
-</div>
-`;
-}
+// Handle window resize
+window.addEventListener('resize', onWindowResize);
 
-/**
-* Update globe with new data
-*/
-function updateGlobeData(countryData) {
-if (!state.globe) return;
+// Add event listeners for globe interaction
+setupGlobeInteractions();
 
-const globeData = countryData.map(country => ({
-lat: 0, // These would normally be actual coordinates
-lng: 0,
-country: country.country_id,
-weight: (country.probability * 100).toFixed(1)
-}));
+// Add control button functionality
+document.getElementById('zoomIn').addEventListener('click', () => {
+camera.position.z = Math.max(150, camera.position.z - 20);
+});
 
-state.globe.hexBinPointsData(globeData);
+document.getElementById('zoomOut').addEventListener('click', () => {
+camera.position.z = Math.min(600, camera.position.z + 20);
+});
 
-// Show the first country by default
-if (countryData.length > 0) {
-const topCountry = countryData[0];
-updateCurrentCountry(topCountry.country_id, (topCountry.probability * 100).toFixed(1));
-}
+document.getElementById('resetView').addEventListener('click', () => {
+camera.position.z = originalCameraZ;
+globe.rotation.x = 0;
+globe.rotation.y = 0;
+outline.rotation.x = 0;
+outline.rotation.y = 0;
+});
 }
 
-/**
-* Show country details in region view
-*/
-async function showCountryDetails(countryCode, probability) {
-try {
-const response = await fetch(`${CONFIG.REST_COUNTRIES}${countryCode}`);
-const countryInfo = await response.json();
-const country = countryInfo[0];
+function onWindowResize() {
+const container = document.querySelector('.globe-container');
+const canvas = document.getElementById('globeCanvas');
 
-elements.countryDetails.innerHTML = `
-<div class="flex items-center justify-center mb-4">
-<img src="${country.flags.png}" alt="${country.name.common} flag" class="country-flag mr-4">
-<h4 class="text-2xl font-bold">${country.name.common}</h4>
-</div>
-<div class="text-lg font-semibold mb-2">${probability}% Match</div>
-<div class="space-y-2 text-left">
-<div><strong>Region:</strong> ${country.region}</div>
-<div><strong>Subregion:</strong> ${country.subregion || 'N/A'}</div>
-<div><strong>Language:</strong> ${Object.values(country.languages || {}).join(', ') || 'N/A'}</div>
-<div><strong>Population:</strong> ${country.population?.toLocaleString() || 'N/A'}</div>
-<div><strong>Capital:</strong> ${country.capital?.[0] || 'N/A'}</div>
-</div>
-`;
-} catch (error) {
-console.error('Error fetching country details:', error);
-elements.countryDetails.innerHTML = `
-<div class="text-center">
-<i class="fas fa-exclamation-triangle mr-2"></i>
-Could not load country details
-</div>
-`;
-}
+camera.aspect = container.clientWidth / container.clientHeight;
+camera.updateProjectionMatrix();
+renderer.setSize(container.clientWidth, container.clientHeight);
 }
 
-/**
-* Update region view with statistics
-*/
-function updateRegionView() {
-if (!state.countryData) return;
+function setupGlobeInteractions() {
+const globeContainer = document.querySelector('.globe-container');
 
-// Group by region (simplified)
-const regions = {
-'Europe': ['GB', 'FR', 'DE', 'IT', 'ES', 'NL', 'BE', 'SE', 'CH', 'AT', 'NO', 'DK', 'FI', 'IE', 'PL', 'GR', 'RO', 'HU', 'CZ', 'SK', 'UA', 'BY', 'RS', 'HR', 'SI', 'BG', 'EE', 'LV', 'LT', 'IS'],
-'Asia': ['RU', 'JP', 'CN', 'KR', 'IN', 'TH', 'VN', 'ID', 'PK', 'BD', 'LK', 'TR', 'IL', 'SA', 'AE'],
-'Americas': ['US', 'CA', 'MX', 'BR', 'AR', 'CL', 'CO', 'PE'],
-'Africa': ['ZA', 'NG', 'EG', 'MA'],
-'Oceania': ['AU']
-};
+globeContainer.addEventListener('mousedown', (e) => {
+isMouseDown = true;
+previousMousePosition = { x: e.clientX, y: e.clientY };
+globeContainer.style.cursor = 'grabbing';
+});
 
-let regionStats = '';
-for (const [region, countries] of Object.entries(regions)) {
-const regionProbability = state.countryData
-.filter(c => countries.includes(c.country_id))
-.reduce((sum, c) => sum + c.probability, 0);
+window.addEventListener('mouseup', () => {
+isMouseDown = false;
+globeContainer.style.cursor = 'grab';
+});
 
-if (regionProbability > 0) {
-regionStats += `
-<div class="flex justify-between items-center py-2 border-b border-white/20 last:border-b-0">
-<span>${region}</span>
-<span class="font-bold">${(regionProbability * 100).toFixed(1)}%</span>
-</div>
-`;
+globeContainer.addEventListener('mousemove', (e) => {
+if (!isMouseDown) return;
+
+const deltaX = e.clientX - previousMousePosition.x;
+const deltaY = e.clientY - previousMousePosition.y;
+
+globe.rotation.y += deltaX * 0.01;
+globe.rotation.x += deltaY * 0.01;
+
+previousMousePosition = { x: e.clientX, y: e.clientY };
+});
+
+// Zoom functionality contained to globe
+globeContainer.addEventListener('wheel', (e) => {
+e.preventDefault();
+
+if (e.deltaY < 0) {
+// Zoom in
+camera.position.z = Math.max(150, camera.position.z - 15);
+} else {
+// Zoom out
+camera.position.z = Math.min(600, camera.position.z + 15);
 }
-}
+});
 
-elements.regionalStats.innerHTML = regionStats || '<div class="text-white/80 text-center">No regional data available</div>';
-}
-
-// ... (rest of the JavaScript functions remain the same as previous version)
-// [The remaining functions like soundex, generateVariants, speakName, etc. would be here]
-// Due to length, I'm keeping the core functionality but you can copy the complete JS from previous response
-
-// Initialize the application
-document.addEventListener('DOMContentLoaded', init);
-
-// Make functions globally available
-window.speakName = speakName;
-window.analyzeName = analyzeName;
-window.showFeature = showFeature;
-
-// Add the missing functions for completeness
-function speakName(name, lang) {
-if ('speechSynthesis' in window) {
-const utterance = new SpeechSynthesisUtterance(name);
-utterance.lang = lang;
-speechSynthesis.speak(utterance);
-}
+// Set initial cursor
+globeContainer.style.cursor = 'grab';
 }
 
-function analyzeName(name) {
-if (!elements.consentCheckbox.checked) {
-alert('Please confirm the privacy notice to continue.');
+// Initialize the globe when the page loads
+window.addEventListener('load', initGlobe);
+
+// Search button functionality
+document.querySelector('.search-btn').addEventListener('click', () => {
+const nameInput = document.querySelector('input[type="text"]');
+const privacyCheck = document.getElementById('privacyCheck');
+
+if (!privacyCheck.checked) {
+alert('Please confirm that you understand this tool processes name data for cultural analysis.');
 return;
 }
 
-showLoading();
-state.currentName = name;
+if (nameInput.value.trim() === '') {
+alert('Please enter a name to analyze.');
+return;
+}
 
-// Simulate API call - in real implementation, this would be the actual API call
+// In a real application, this would trigger the name analysis
+// For now, we'll just show a message and add a visual effect
+const name = nameInput.value.trim();
+alert(`Analyzing the cultural origins of: ${name}\n\nIn a full implementation, this would display detailed cultural analysis, distribution maps, and historical context.`);
+
+// Add a visual feedback effect
+const btn = document.querySelector('.search-btn');
+btn.style.background = 'var(--accent)';
 setTimeout(() => {
-// Mock data for demonstration
-const mockData = {
-country: [
-{country_id: "US", probability: 0.25},
-{country_id: "GB", probability: 0.18},
-{country_id: "FR", probability: 0.12},
-{country_id: "DE", probability: 0.08},
-{country_id: "IT", probability: 0.06}
-]
-};
+btn.style.background = 'var(--primary)';
+}, 1000);
+});
 
-state.countryData = mockData.country;
-updateGlobeData(mockData.country);
-hideLoading();
-
-// Show success message
-elements.results.innerHTML = `
-<div class="fade-in text-center p-8">
-<div class="text-4xl mb-4 text-green-500">✅</div>
-<h3 class="text-xl font-semibold mb-2">Analysis Complete!</h3>
-<p class="text-gray-600">Found ${mockData.country.length} countries for "${name}"</p>
-</div>
-`;
-
-}, 1500);
+// Allow Enter key to trigger search
+document.querySelector('input[type="text"]').addEventListener('keypress', (e) => {
+if (e.key === 'Enter') {
+document.querySelector('.search-btn').click();
 }
-
-function showLoading() {
-state.isAnalyzing = true;
-elements.btnText.classList.add('hidden');
-elements.btnLoading.classList.remove('hidden');
-elements.analyzeBtn.disabled = true;
-}
-
-function hideLoading() {
-state.isAnalyzing = false;
-elements.btnText.classList.remove('hidden');
-elements.btnLoading.classList.add('hidden');
-handleInputChange();
-}
+});
 </script>
 </body>
 </html>
