@@ -779,6 +779,8 @@ padding: 25px;
 </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
 <script>
 // Enhanced Name Database with 200+ names
 const nameDatabase = {
@@ -1212,250 +1214,147 @@ const resetViewBtn = document.getElementById('resetView');
 const warningModal = document.getElementById('warningModal');
 const warningCloseBtn = document.getElementById('warningCloseBtn');
 
-// Canvas variables
-let canvas, ctx;
-let scale = 1;
-let offsetX = 0;
-let offsetY = 0;
-let isDragging = false;
-let lastX, lastY;
+// Three.js variables
+let scene, camera, renderer, earthMesh, cloudMesh, controls;
+let earthRadius = 200;
 
 // Initialize the application
 function init() {
-initEarthCanvas();
+initEarth3D();
 setupEventListeners();
 }
 
-// Initialize Earth Canvas with Google Earth-style visualization
-function initEarthCanvas() {
-canvas = document.getElementById('earthCanvas');
-ctx = canvas.getContext('2d');
+// Initialize 3D Earth with Three.js
+function initEarth3D() {
+const canvas = document.getElementById('earthCanvas');
 
-// Set canvas size
-canvas.width = 500;
-canvas.height = 500;
+// Create scene
+scene = new THREE.Scene();
 
-// Draw the initial Earth
-drawEarth();
+// Create camera
+camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+camera.position.z = 500;
 
-// Add interaction
-setupCanvasInteractions();
+// Create renderer
+renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+
+// Add lighting
+const ambientLight = new THREE.AmbientLight(0x333333);
+scene.add(ambientLight);
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+directionalLight.position.set(5, 3, 5);
+scene.add(directionalLight);
+
+// Create Earth sphere with realistic texture
+const earthGeometry = new THREE.SphereGeometry(earthRadius, 64, 64);
+
+// Load Earth texture
+const earthTexture = new THREE.TextureLoader().load(
+'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg',
+() => {
+// Texture loaded callback
+},
+undefined,
+(err) => {
+console.error('Error loading Earth texture:', err);
 }
-
-// Draw realistic Earth with Google Earth style
-function drawEarth() {
-// Clear canvas
-ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-// Draw space background
-drawSpaceBackground();
-
-// Save context for transformations
-ctx.save();
-
-// Apply transformations for zoom and pan
-ctx.translate(canvas.width / 2 + offsetX, canvas.height / 2 + offsetY);
-ctx.scale(scale, scale);
-
-// Draw Earth sphere with gradient
-drawEarthSphere();
-
-// Draw continents with realistic shapes
-drawContinents();
-
-// Draw country borders
-drawCountryBorders();
-
-// Draw cloud cover
-drawClouds();
-
-// Restore context
-ctx.restore();
-}
-
-// Draw space background with stars
-function drawSpaceBackground() {
-// Draw dark blue background
-ctx.fillStyle = '#0a0a2a';
-ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-// Draw stars
-ctx.fillStyle = 'white';
-for (let i = 0; i < 200; i++) {
-const x = Math.random() * canvas.width;
-const y = Math.random() * canvas.height;
-const radius = Math.random() * 1.2;
-ctx.beginPath();
-ctx.arc(x, y, radius, 0, Math.PI * 2);
-ctx.fill();
-}
-}
-
-// Draw Earth sphere with realistic gradient
-function drawEarthSphere() {
-const radius = 200;
-
-// Create radial gradient for Earth
-const gradient = ctx.createRadialGradient(
--40, -40, 0,
-0, 0, radius
 );
-gradient.addColorStop(0, '#1a5276');
-gradient.addColorStop(0.5, '#2980b9');
-gradient.addColorStop(1, '#1a5276');
 
-ctx.fillStyle = gradient;
-ctx.beginPath();
-ctx.arc(0, 0, radius, 0, Math.PI * 2);
-ctx.fill();
-
-// Add specular highlight
-ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-ctx.beginPath();
-ctx.arc(-radius * 0.3, -radius * 0.3, radius * 0.4, 0, Math.PI * 2);
-ctx.fill();
-}
-
-// Draw realistic continent shapes
-function drawContinents() {
-ctx.fillStyle = '#27ae60';
-
-// North America
-ctx.beginPath();
-ctx.moveTo(-120, -30);
-ctx.bezierCurveTo(-150, -50, -130, 20, -80, 40);
-ctx.bezierCurveTo(-60, 60, -40, 30, -20, 10);
-ctx.bezierCurveTo(-10, -20, -50, -40, -120, -30);
-ctx.fill();
-
-// South America
-ctx.beginPath();
-ctx.moveTo(-70, 50);
-ctx.bezierCurveTo(-80, 80, -60, 120, -30, 130);
-ctx.bezierCurveTo(-10, 140, 10, 120, 0, 80);
-ctx.bezierCurveTo(-10, 60, -40, 50, -70, 50);
-ctx.fill();
-
-// Europe
-ctx.beginPath();
-ctx.moveTo(-10, -40);
-ctx.bezierCurveTo(0, -30, 20, -20, 30, -10);
-ctx.bezierCurveTo(40, 0, 30, 20, 10, 30);
-ctx.bezierCurveTo(-10, 40, -30, 30, -40, 10);
-ctx.bezierCurveTo(-50, -10, -30, -30, -10, -40);
-ctx.fill();
-
-// Africa
-ctx.beginPath();
-ctx.moveTo(10, -30);
-ctx.bezierCurveTo(30, -20, 50, 0, 60, 30);
-ctx.bezierCurveTo(70, 60, 50, 90, 20, 100);
-ctx.bezierCurveTo(-10, 110, -30, 90, -20, 60);
-ctx.bezierCurveTo(-10, 30, 0, 0, 10, -30);
-ctx.fill();
-
-// Asia
-ctx.beginPath();
-ctx.moveTo(40, -50);
-ctx.bezierCurveTo(80, -40, 120, -20, 140, 10);
-ctx.bezierCurveTo(160, 40, 150, 80, 120, 100);
-ctx.bezierCurveTo(90, 120, 60, 110, 40, 80);
-ctx.bezierCurveTo(20, 50, 10, 10, 40, -50);
-ctx.fill();
-
-// Australia
-ctx.beginPath();
-ctx.moveTo(100, 50);
-ctx.bezierCurveTo(120, 60, 130, 80, 120, 100);
-ctx.bezierCurveTo(110, 120, 90, 130, 70, 120);
-ctx.bezierCurveTo(50, 110, 40, 90, 50, 70);
-ctx.bezierCurveTo(60, 50, 80, 40, 100, 50);
-ctx.fill();
-}
-
-// Draw country borders
-function drawCountryBorders() {
-ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-ctx.lineWidth = 1;
-
-// Simplified country borders
-// North America
-ctx.beginPath();
-ctx.moveTo(-100, -10);
-ctx.lineTo(-80, 20);
-ctx.stroke();
-
-// Europe/Asia border
-ctx.beginPath();
-ctx.moveTo(20, -30);
-ctx.lineTo(40, 10);
-ctx.stroke();
-}
-
-// Draw cloud cover
-function drawClouds() {
-ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-
-// Cloud over Pacific
-ctx.beginPath();
-ctx.arc(150, 0, 30, 0, Math.PI * 2);
-ctx.fill();
-
-// Cloud over Atlantic
-ctx.beginPath();
-ctx.arc(-100, 20, 25, 0, Math.PI * 2);
-ctx.fill();
-
-// Cloud over Indian Ocean
-ctx.beginPath();
-ctx.arc(80, 60, 20, 0, Math.PI * 2);
-ctx.fill();
-}
-
-// Setup canvas interactions
-function setupCanvasInteractions() {
-canvas.addEventListener('mousedown', (e) => {
-isDragging = true;
-lastX = e.clientX;
-lastY = e.clientY;
-canvas.style.cursor = 'grabbing';
+const earthMaterial = new THREE.MeshPhongMaterial({
+map: earthTexture,
+specular: new THREE.Color(0x333333),
+shininess: 5
 });
 
-window.addEventListener('mouseup', () => {
-isDragging = false;
-canvas.style.cursor = 'grab';
+earthMesh = new THREE.Mesh(earthGeometry, earthMaterial);
+scene.add(earthMesh);
+
+// Create cloud layer
+const cloudGeometry = new THREE.SphereGeometry(earthRadius + 5, 64, 64);
+
+// Load cloud texture
+const cloudTexture = new THREE.TextureLoader().load(
+'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_clouds_1024.png',
+() => {
+// Texture loaded callback
+},
+undefined,
+(err) => {
+console.error('Error loading cloud texture:', err);
+}
+);
+
+const cloudMaterial = new THREE.MeshPhongMaterial({
+map: cloudTexture,
+transparent: true,
+opacity: 0.4
 });
 
-canvas.addEventListener('mousemove', (e) => {
-if (!isDragging) return;
+cloudMesh = new THREE.Mesh(cloudGeometry, cloudMaterial);
+scene.add(cloudMesh);
 
-const deltaX = e.clientX - lastX;
-const deltaY = e.clientY - lastY;
+// Add stars background
+const starGeometry = new THREE.BufferGeometry();
+const starCount = 10000;
+const starPositions = new Float32Array(starCount * 3);
 
-offsetX += deltaX;
-offsetY += deltaY;
+for (let i = 0; i < starCount * 3; i++) {
+starPositions[i] = (Math.random() - 0.5) * 2000;
+}
 
-lastX = e.clientX;
-lastY = e.clientY;
+starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
 
-drawEarth();
+const starMaterial = new THREE.PointsMaterial({
+color: 0xffffff,
+size: 1,
+sizeAttenuation: true
 });
 
-canvas.addEventListener('wheel', (e) => {
-e.preventDefault();
+const stars = new THREE.Points(starGeometry, starMaterial);
+scene.add(stars);
 
-const zoomIntensity = 0.1;
-const wheel = e.deltaY < 0 ? 1 : -1;
-const zoom = Math.exp(wheel * zoomIntensity);
+// Add orbit controls
+controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.minDistance = 300;
+controls.maxDistance = 1000;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.5;
 
-scale *= zoom;
-scale = Math.max(0.5, Math.min(3, scale));
+// Start animation loop
+animate();
 
-drawEarth();
-});
+// Handle window resize
+window.addEventListener('resize', onWindowResize);
+}
 
-// Set initial cursor
-canvas.style.cursor = 'grab';
+// Animation loop
+function animate() {
+requestAnimationFrame(animate);
+
+// Rotate Earth and clouds
+if (earthMesh) earthMesh.rotation.y += 0.001;
+if (cloudMesh) cloudMesh.rotation.y += 0.0015;
+
+// Update controls
+if (controls) controls.update();
+
+// Render scene
+if (renderer && scene && camera) {
+renderer.render(scene, camera);
+}
+}
+
+// Handle window resize
+function onWindowResize() {
+const canvas = document.getElementById('earthCanvas');
+camera.aspect = canvas.offsetWidth / canvas.offsetHeight;
+camera.updateProjectionMatrix();
+renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
 }
 
 // Setup event listeners
@@ -1478,20 +1377,24 @@ analyzeName();
 
 // Globe controls
 zoomInBtn.addEventListener('click', () => {
-scale = Math.min(3, scale + 0.2);
-drawEarth();
+if (controls) {
+controls.minDistance = Math.max(200, controls.minDistance - 50);
+controls.maxDistance = Math.max(400, controls.maxDistance - 50);
+}
 });
 
 zoomOutBtn.addEventListener('click', () => {
-scale = Math.max(0.5, scale - 0.2);
-drawEarth();
+if (controls) {
+controls.minDistance += 50;
+controls.maxDistance += 50;
+}
 });
 
 resetViewBtn.addEventListener('click', () => {
-scale = 1;
-offsetX = 0;
-offsetY = 0;
-drawEarth();
+if (controls) {
+controls.reset();
+controls.autoRotate = true;
+}
 });
 
 // Warning modal close button
@@ -1565,7 +1468,7 @@ setTimeout(() => {
 firstNameInput.value = '';
 lastNameInput.value = '';
 analysisResult.style.display = 'none';
-resetViewBtn.click(); // Reset globe view
+if (controls) controls.reset(); // Reset globe view
 }, 5000);
 
 }, 1000);
