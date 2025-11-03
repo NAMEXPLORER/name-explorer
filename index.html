@@ -36,7 +36,7 @@ line-height: 1.6;
 }
 
 .container {
-max-width: 1200px;
+max-width: 1400px;
 margin: 0 auto;
 padding: 20px;
 }
@@ -77,16 +77,14 @@ border: 1px solid rgba(255, 255, 255, 0.1);
 
 .main-content {
 display: flex;
-flex-wrap: wrap;
-justify-content: center;
+justify-content: space-between;
 gap: 40px;
 margin: 40px 0;
-align-items: center;
+align-items: flex-start;
 }
 
 .globe-section {
 flex: 1;
-min-width: 500px;
 display: flex;
 justify-content: center;
 align-items: center;
@@ -149,48 +147,17 @@ background: rgba(255, 255, 255, 0.3);
 transform: scale(1.1);
 }
 
-.ai-globe-controls {
-position: absolute;
-top: 20px;
-left: 50%;
-transform: translateX(-50%);
-background: rgba(0, 0, 0, 0.5);
-padding: 10px 20px;
-border-radius: 30px;
-display: flex;
-gap: 10px;
-backdrop-filter: blur(10px);
-z-index: 10;
-}
-
-.ai-btn {
-background: var(--accent);
-color: white;
-border: none;
-padding: 8px 15px;
-border-radius: 20px;
-font-size: 0.9rem;
-cursor: pointer;
-transition: all 0.3s ease;
-display: flex;
-align-items: center;
-gap: 5px;
-}
-
-.ai-btn:hover {
-background: #25a55f;
-transform: translateY(-2px);
-}
-
 .search-section {
 flex: 1;
-min-width: 400px;
 background: var(--card-bg);
 backdrop-filter: blur(15px);
 border-radius: 20px;
 padding: 35px;
 box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 border: 1px solid var(--card-border);
+min-height: 500px;
+display: flex;
+flex-direction: column;
 }
 
 .search-title {
@@ -353,6 +320,8 @@ background: rgba(0, 0, 0, 0.3);
 border-radius: 15px;
 display: none;
 animation: fadeIn 0.5s ease;
+flex-grow: 1;
+overflow-y: auto;
 }
 
 @keyframes fadeIn {
@@ -643,13 +612,13 @@ background: var(--primary-dark);
 transform: translateY(-2px);
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
 .main-content {
 flex-direction: column;
 }
 
 .globe-section, .search-section {
-min-width: 100%;
+width: 100%;
 }
 
 .globe-container {
@@ -717,11 +686,6 @@ padding: 25px;
 <div class="globe-section">
 <div class="globe-container">
 <canvas id="globeCanvas"></canvas>
-<div class="ai-globe-controls">
-<button class="ai-btn" id="generateAIGlobe">
-<i class="fas fa-robot"></i> AI Generate Globe
-</button>
-</div>
 <div class="globe-controls">
 <button class="control-btn" id="zoomIn"><i class="fas fa-plus"></i></button>
 <button class="control-btn" id="zoomOut"><i class="fas fa-minus"></i></button>
@@ -994,7 +958,6 @@ const loadingSpinner = document.getElementById('loadingSpinner');
 const zoomInBtn = document.getElementById('zoomIn');
 const zoomOutBtn = document.getElementById('zoomOut');
 const resetViewBtn = document.getElementById('resetView');
-const generateAIGlobeBtn = document.getElementById('generateAIGlobe');
 const warningModal = document.getElementById('warningModal');
 const warningCloseBtn = document.getElementById('warningCloseBtn');
 
@@ -1013,7 +976,7 @@ analyzeName();
 }, 1000);
 }
 
-// Initialize Three.js Globe
+// Initialize Three.js Globe with Google Earth-like appearance
 function initGlobe() {
 // Scene setup
 scene = new THREE.Scene();
@@ -1033,12 +996,12 @@ alpha: true
 renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-// Create Earth-like globe
+// Create realistic Earth globe with texture
 const globeGeometry = new THREE.SphereGeometry(100, 128, 128);
 
-// Create Earth texture
+// Create a more realistic Earth material
 const globeMaterial = new THREE.MeshPhongMaterial({
-color: 0x2980b9,
+color: 0x2980b9, // Ocean blue
 specular: 0x555555,
 shininess: 30,
 transparent: true,
@@ -1074,7 +1037,7 @@ side: THREE.BackSide
 const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
 scene.add(atmosphere);
 
-// Add lighting
+// Add enhanced lighting for realism
 const ambientLight = new THREE.AmbientLight(0x333333, 0.4);
 scene.add(ambientLight);
 
@@ -1082,13 +1045,18 @@ const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
 directionalLight.position.set(5, 3, 5);
 scene.add(directionalLight);
 
-// Add stars
+const pointLight = new THREE.PointLight(0x4488ff, 0.5, 500);
+pointLight.position.set(10, 10, 10);
+scene.add(pointLight);
+
+// Add stars background
 addStars();
 
 // Animation
 function animate() {
 requestAnimationFrame(animate);
 
+// Enhanced rotation with multiple layers
 globe.rotation.y += 0.0005;
 clouds.rotation.y += 0.0007;
 
@@ -1256,9 +1224,6 @@ globe.rotation.x = 0;
 globe.rotation.y = 0;
 });
 
-// AI Globe Generator
-generateAIGlobeBtn.addEventListener('click', generateAIGlobe);
-
 // Warning modal close button
 warningCloseBtn.addEventListener('click', () => {
 warningModal.style.display = 'none';
@@ -1281,31 +1246,6 @@ firstNameInput.value = '';
 analyzeName();
 });
 });
-}
-
-// Generate AI Globe
-function generateAIGlobe() {
-// Show loading state
-generateAIGlobeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
-generateAIGlobeBtn.disabled = true;
-
-// Simulate AI generation
-setTimeout(() => {
-// Create enhanced Earth visualization
-const earthSchemes = [
-{ ocean: '#1a5276', land: '#27ae60', atmosphere: '#3498db' },
-{ ocean: '#154360', land: '#196f3d', atmosphere: '#2874a6' },
-{ ocean: '#21618c', land: '#145a32', atmosphere: '#1f618d' }
-];
-
-const scheme = earthSchemes[Math.floor(Math.random() * earthSchemes.length)];
-
-// Reset button
-generateAIGlobeBtn.innerHTML = '<i class="fas fa-robot"></i> AI Generate Globe';
-generateAIGlobeBtn.disabled = false;
-
-alert('AI Globe generated successfully! Enhanced Earth visualization applied.');
-}, 1500);
 }
 
 // Analyze name function with validation
@@ -1374,7 +1314,6 @@ let html = `
 <button class="audio-btn" onclick="playPronunciation('${name}')" id="audioBtn-${name}">
 <i class="fas fa-volume-up"></i>
 </button>
-<span class="audio-loading" id="loading-${name}">Loading audio...</span>
 </div>
 </div>
 <div class="analysis-section">
@@ -1385,14 +1324,20 @@ ${data.variants.map(variant => `<span class="variant">${variant}</span>`).join('
 </div>
 </div>
 
-<div class="analysis-section">
-<h4>Historical Context</h4>
-<p>${data.history}</p>
-</div>
-
-<div class="analysis-section">
-<h4>Cultural Significance</h4>
-<p>${data.culturalSignificance}</p>
+<div class="external-links" style="margin-top: 20px;">
+<h4>Learn More About This Name</h4>
+<a href="https://www.behindthename.com/name/${name}" target="_blank" class="external-link">
+<i class="fas fa-external-link-alt"></i> Behind the Name
+</a>
+<a href="https://forvo.com/word/${name}/" target="_blank" class="external-link">
+<i class="fas fa-volume-up"></i> Forvo Pronunciation
+</a>
+<a href="https://www.nameshouts.com/name/${name}" target="_blank" class="external-link">
+<i class="fas fa-language"></i> NameShouts
+</a>
+<a href="https://en.wikipedia.org/wiki/${nameCapitalized}_(name)" target="_blank" class="external-link">
+<i class="fab fa-wikipedia-w"></i> Wikipedia
+</a>
 </div>
 
 <div class="distribution-chart">
@@ -1403,18 +1348,6 @@ ${Object.keys(data.distribution).map(country =>
 `<div class="country-tag">${country}: ${data.distribution[country]}%</div>`
 ).join('')}
 </div>
-</div>
-
-<div class="external-links">
-<a href="https://www.behindthename.com/name/${name}" target="_blank" class="external-link">
-<i class="fas fa-external-link-alt"></i> Behind the Name
-</a>
-<a href="https://forvo.com/word/${name}/" target="_blank" class="external-link">
-<i class="fas fa-external-link-alt"></i> Forvo Pronunciation
-</a>
-<a href="https://en.wikipedia.org/wiki/${nameCapitalized}_(name)" target="_blank" class="external-link">
-<i class="fas fa-external-link-alt"></i> Wikipedia
-</a>
 </div>
 `;
 
@@ -1435,20 +1368,21 @@ analysisResult.style.display = 'block';
 analysisResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-// Play pronunciation audio
+// Play pronunciation audio - Improved with immediate response
 function playPronunciation(name) {
 const nameData = nameDatabase[name];
 if (!nameData) return;
 
 const audioBtn = document.getElementById(`audioBtn-${name}`);
-const loadingEl = document.getElementById(`loading-${name}`);
 
-// Show loading state
+// Show playing state immediately
 audioBtn.classList.add('playing');
-loadingEl.style.display = 'inline';
 
 // Use Web Speech API
 if ('speechSynthesis' in window) {
+// Cancel any ongoing speech
+speechSynthesis.cancel();
+
 const utterance = new SpeechSynthesisUtterance(name);
 
 // Try to set appropriate language based on name origin
@@ -1458,6 +1392,8 @@ utterance.lang = 'fr-FR';
 utterance.lang = 'es-ES';
 } else if (nameData.origins.includes("German")) {
 utterance.lang = 'de-DE';
+} else if (nameData.origins.includes("Arabic")) {
+utterance.lang = 'ar-SA';
 } else {
 utterance.lang = 'en-US';
 }
@@ -1467,12 +1403,10 @@ utterance.pitch = 1;
 
 utterance.onend = function() {
 audioBtn.classList.remove('playing');
-loadingEl.style.display = 'none';
 };
 
 utterance.onerror = function() {
 audioBtn.classList.remove('playing');
-loadingEl.style.display = 'none';
 alert(`Could not play pronunciation. Please use the external links for audio pronunciation.`);
 };
 
@@ -1480,7 +1414,6 @@ speechSynthesis.speak(utterance);
 } else {
 // Fallback if Web Speech API is not available
 audioBtn.classList.remove('playing');
-loadingEl.style.display = 'none';
 alert(`Pronunciation: ${nameData.pronunciation}. Your browser doesn't support audio playback.`);
 }
 }
